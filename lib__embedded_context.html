@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module lib__embedded_context</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>lib__embedded_context</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/michel/Dropbox%20%28Compte%20personnel%29/1-PROJETS%20EN%20COURS/Git/chat_embeddings/lib__embedded_context.py">/Users/michel/Dropbox (Compte personnel)/1-PROJETS EN COURS/Git/chat_embeddings/lib__embedded_context.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;----------------------------------------------------------------------------<br>
+#&nbsp;Project:&nbsp;Semantic&nbsp;Search&nbsp;Module<br>
+#&nbsp;File:&nbsp;&nbsp;&nbsp;&nbsp;lib__embedded_context.py<br>
+#&nbsp;<br>
+#&nbsp;This&nbsp;lib&nbsp;is&nbsp;part&nbsp;of&nbsp;the&nbsp;Semantic&nbsp;Search&nbsp;Module&nbsp;project.&nbsp;It&nbsp;implements&nbsp;a&nbsp;<br>
+#&nbsp;system&nbsp;for&nbsp;understanding&nbsp;and&nbsp;processing&nbsp;natural&nbsp;language&nbsp;to&nbsp;facilitate&nbsp;<br>
+#&nbsp;information&nbsp;retrieval&nbsp;based&nbsp;on&nbsp;semantics&nbsp;rather&nbsp;than&nbsp;traditional&nbsp;keyword-based&nbsp;search.<br>
+#&nbsp;<br>
+#&nbsp;Author:&nbsp;&nbsp;Michel&nbsp;Levy&nbsp;Provencal<br>
+#&nbsp;Brightness.ai&nbsp;-&nbsp;2023&nbsp;-&nbsp;contact@brightness.fr<br>
+#&nbsp;----------------------------------------------------------------------------</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="csv.html">csv</a><br>
+<a href="numpy.html">numpy</a><br>
+<a href="openai.html">openai</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="pandas.html">pandas</a><br>
+<a href="random.html">random</a><br>
+</td><td width="25%" valign=top><a href="requests.html">requests</a><br>
+<a href="sys.html">sys</a><br>
+<a href="time.html">time</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-build_index"><strong>build_index</strong></a>(folder_path)</dt><dd><tt>This&nbsp;function&nbsp;reads&nbsp;multiple&nbsp;text&nbsp;files&nbsp;from&nbsp;a&nbsp;specified&nbsp;folder,&nbsp;concatenates&nbsp;the&nbsp;text,&nbsp;<br>
+splits&nbsp;the&nbsp;concatenated&nbsp;text&nbsp;into&nbsp;blocks&nbsp;of&nbsp;specified&nbsp;length,&nbsp;writes&nbsp;these&nbsp;blocks&nbsp;into&nbsp;a&nbsp;CSV&nbsp;file,&nbsp;<br>
+creates&nbsp;embeddings&nbsp;for&nbsp;each&nbsp;block&nbsp;using&nbsp;the&nbsp;create_embeddings&nbsp;function,&nbsp;and&nbsp;finally,&nbsp;saves&nbsp;the&nbsp;<br>
+embeddings&nbsp;back&nbsp;to&nbsp;the&nbsp;CSV&nbsp;file.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;first&nbsp;generates&nbsp;a&nbsp;random&nbsp;number&nbsp;which&nbsp;is&nbsp;used&nbsp;to&nbsp;create&nbsp;unique&nbsp;filenames&nbsp;for&nbsp;the&nbsp;<br>
+intermediate&nbsp;text&nbsp;and&nbsp;CSV&nbsp;files.&nbsp;It&nbsp;then&nbsp;reads&nbsp;and&nbsp;concatenates&nbsp;all&nbsp;the&nbsp;text&nbsp;files&nbsp;from&nbsp;the&nbsp;<br>
+specified&nbsp;folder&nbsp;into&nbsp;a&nbsp;single&nbsp;string&nbsp;of&nbsp;text.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;then&nbsp;calls&nbsp;the&nbsp;split_text_into_blocks&nbsp;function&nbsp;to&nbsp;split&nbsp;the&nbsp;text&nbsp;into&nbsp;blocks&nbsp;of&nbsp;<br>
+up&nbsp;to&nbsp;4000&nbsp;characters&nbsp;each.&nbsp;The&nbsp;resulting&nbsp;list&nbsp;of&nbsp;blocks&nbsp;is&nbsp;written&nbsp;to&nbsp;a&nbsp;new&nbsp;CSV&nbsp;file.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;then&nbsp;calls&nbsp;the&nbsp;create_embeddings&nbsp;function&nbsp;to&nbsp;create&nbsp;embeddings&nbsp;for&nbsp;each&nbsp;text&nbsp;block&nbsp;<br>
+in&nbsp;the&nbsp;CSV&nbsp;file.&nbsp;The&nbsp;embeddings&nbsp;are&nbsp;saved&nbsp;back&nbsp;to&nbsp;the&nbsp;CSV&nbsp;file.<br>
+&nbsp;<br>
+Finally,&nbsp;the&nbsp;function&nbsp;returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;CSV&nbsp;file&nbsp;containing&nbsp;the&nbsp;embeddings.<br>
+&nbsp;<br>
+:param&nbsp;folder_path:&nbsp;The&nbsp;directory&nbsp;path&nbsp;where&nbsp;the&nbsp;text&nbsp;files&nbsp;are&nbsp;located&nbsp;and&nbsp;where&nbsp;the&nbsp;CSV&nbsp;file&nbsp;will&nbsp;be&nbsp;saved.<br>
+:return:&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;CSV&nbsp;file&nbsp;containing&nbsp;the&nbsp;embeddings.</tt></dd></dl>
+ <dl><dt><a name="-concat_files_in_text"><strong>concat_files_in_text</strong></a>(path)</dt><dd><tt>Concatenates&nbsp;the&nbsp;files&nbsp;of&nbsp;a&nbsp;directory&nbsp;into&nbsp;a&nbsp;single&nbsp;text.<br>
+:param&nbsp;path:&nbsp;Directory&nbsp;path.<br>
+:return:&nbsp;Concatenated&nbsp;text.</tt></dd></dl>
+ <dl><dt><a name="-create_embeddings"><strong>create_embeddings</strong></a>(path, filename)</dt><dd><tt>This&nbsp;function&nbsp;reads&nbsp;text&nbsp;data&nbsp;from&nbsp;a&nbsp;specified&nbsp;CSV&nbsp;file&nbsp;and&nbsp;creates&nbsp;embeddings&nbsp;for&nbsp;each&nbsp;text&nbsp;entry&nbsp;using&nbsp;OpenAI's<br>
+Embedding&nbsp;API.&nbsp;It&nbsp;then&nbsp;saves&nbsp;the&nbsp;generated&nbsp;embeddings&nbsp;back&nbsp;to&nbsp;a&nbsp;new&nbsp;CSV&nbsp;file.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;uses&nbsp;a&nbsp;GPT-2&nbsp;tokenizer&nbsp;to&nbsp;tokenize&nbsp;the&nbsp;text&nbsp;data.&nbsp;It&nbsp;then&nbsp;filters&nbsp;out&nbsp;rows&nbsp;where&nbsp;the&nbsp;number&nbsp;of&nbsp;tokens<br>
+exceeds&nbsp;8000&nbsp;and&nbsp;keeps&nbsp;the&nbsp;last&nbsp;2000&nbsp;records.&nbsp;The&nbsp;function&nbsp;also&nbsp;drops&nbsp;rows&nbsp;with&nbsp;missing&nbsp;values&nbsp;from&nbsp;the&nbsp;data.<br>
+&nbsp;<br>
+The&nbsp;embeddings&nbsp;are&nbsp;generated&nbsp;using&nbsp;the&nbsp;'text-embedding-ada-002'&nbsp;model&nbsp;by&nbsp;default,&nbsp;and&nbsp;the&nbsp;generated&nbsp;embeddings&nbsp;are&nbsp;<br>
+saved&nbsp;as&nbsp;a&nbsp;new&nbsp;column&nbsp;in&nbsp;the&nbsp;DataFrame.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;finally&nbsp;saves&nbsp;the&nbsp;DataFrame,&nbsp;with&nbsp;the&nbsp;embeddings,&nbsp;to&nbsp;a&nbsp;new&nbsp;CSV&nbsp;file.<br>
+&nbsp;<br>
+:param&nbsp;path:&nbsp;The&nbsp;directory&nbsp;path&nbsp;where&nbsp;the&nbsp;input&nbsp;and&nbsp;output&nbsp;CSV&nbsp;files&nbsp;are&nbsp;located.<br>
+:param&nbsp;filename:&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;input&nbsp;CSV&nbsp;file&nbsp;from&nbsp;which&nbsp;to&nbsp;read&nbsp;the&nbsp;text&nbsp;data.</tt></dd></dl>
+ <dl><dt><a name="-find_context"><strong>find_context</strong></a>(text, index_filename, n_results=3)</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;as&nbsp;input&nbsp;a&nbsp;piece&nbsp;of&nbsp;text,&nbsp;the&nbsp;filename&nbsp;of&nbsp;a&nbsp;CSV&nbsp;file&nbsp;containing&nbsp;indexed&nbsp;data,&nbsp;<br>
+and&nbsp;an&nbsp;optional&nbsp;number&nbsp;of&nbsp;results&nbsp;to&nbsp;return.&nbsp;It&nbsp;finds&nbsp;the&nbsp;most&nbsp;similar&nbsp;data&nbsp;items&nbsp;to&nbsp;the&nbsp;input&nbsp;<br>
+text&nbsp;in&nbsp;the&nbsp;indexed&nbsp;data&nbsp;and&nbsp;returns&nbsp;the&nbsp;combined&nbsp;data&nbsp;from&nbsp;these&nbsp;items.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;first&nbsp;loads&nbsp;environment&nbsp;variables&nbsp;from&nbsp;a&nbsp;.env&nbsp;file,&nbsp;including&nbsp;the&nbsp;OpenAI&nbsp;API&nbsp;key.&nbsp;<br>
+It&nbsp;then&nbsp;reads&nbsp;and&nbsp;processes&nbsp;the&nbsp;indexed&nbsp;data&nbsp;from&nbsp;the&nbsp;CSV&nbsp;file&nbsp;into&nbsp;a&nbsp;DataFrame.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;creates&nbsp;an&nbsp;embedding&nbsp;for&nbsp;the&nbsp;input&nbsp;text&nbsp;using&nbsp;the&nbsp;get_search_vector&nbsp;function.&nbsp;<br>
+This&nbsp;embedding&nbsp;is&nbsp;compared&nbsp;with&nbsp;the&nbsp;embeddings&nbsp;of&nbsp;the&nbsp;data&nbsp;items&nbsp;in&nbsp;the&nbsp;DataFrame&nbsp;to&nbsp;find&nbsp;<br>
+the&nbsp;most&nbsp;similar&nbsp;items.<br>
+&nbsp;<br>
+The&nbsp;most&nbsp;similar&nbsp;items&nbsp;are&nbsp;sorted&nbsp;by&nbsp;their&nbsp;similarity&nbsp;scores,&nbsp;and&nbsp;the&nbsp;top&nbsp;'n_results'&nbsp;items&nbsp;are&nbsp;<br>
+selected.&nbsp;The&nbsp;combined&nbsp;data&nbsp;from&nbsp;these&nbsp;items&nbsp;is&nbsp;extracted&nbsp;and&nbsp;returned.<br>
+&nbsp;<br>
+:param&nbsp;text:&nbsp;The&nbsp;input&nbsp;text&nbsp;for&nbsp;which&nbsp;to&nbsp;find&nbsp;similar&nbsp;data&nbsp;items.<br>
+:param&nbsp;index_filename:&nbsp;The&nbsp;filename&nbsp;of&nbsp;the&nbsp;CSV&nbsp;file&nbsp;containing&nbsp;the&nbsp;indexed&nbsp;data.<br>
+:param&nbsp;n_results:&nbsp;The&nbsp;number&nbsp;of&nbsp;most&nbsp;similar&nbsp;data&nbsp;items&nbsp;to&nbsp;return.&nbsp;Default&nbsp;is&nbsp;3.<br>
+:return:&nbsp;The&nbsp;combined&nbsp;data&nbsp;from&nbsp;the&nbsp;most&nbsp;similar&nbsp;data&nbsp;items.</tt></dd></dl>
+ <dl><dt><a name="-find_similar_rows"><strong>find_similar_rows</strong></a>(df, searchvector, n_results)</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;as&nbsp;input&nbsp;a&nbsp;DataFrame,&nbsp;a&nbsp;search&nbsp;vector,&nbsp;and&nbsp;a&nbsp;number&nbsp;of&nbsp;results&nbsp;to&nbsp;return.<br>
+It&nbsp;calculates&nbsp;the&nbsp;cosine&nbsp;similarity&nbsp;between&nbsp;the&nbsp;search&nbsp;vector&nbsp;and&nbsp;the&nbsp;embeddings&nbsp;in&nbsp;the&nbsp;DataFrame.&nbsp;<br>
+The&nbsp;rows&nbsp;with&nbsp;the&nbsp;highest&nbsp;cosine&nbsp;similarity&nbsp;are&nbsp;then&nbsp;sorted&nbsp;and&nbsp;the&nbsp;top&nbsp;'n_results'&nbsp;rows&nbsp;are&nbsp;returned.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;adds&nbsp;a&nbsp;new&nbsp;column,&nbsp;'similarities',&nbsp;to&nbsp;the&nbsp;DataFrame.&nbsp;For&nbsp;each&nbsp;row,&nbsp;it&nbsp;computes&nbsp;the&nbsp;dot&nbsp;<br>
+product&nbsp;between&nbsp;the&nbsp;'ada_embedding'&nbsp;of&nbsp;the&nbsp;row&nbsp;and&nbsp;the&nbsp;search&nbsp;vector,&nbsp;which&nbsp;is&nbsp;equivalent&nbsp;to&nbsp;calculating&nbsp;<br>
+the&nbsp;cosine&nbsp;similarity&nbsp;when&nbsp;the&nbsp;vectors&nbsp;are&nbsp;normalized.<br>
+&nbsp;<br>
+The&nbsp;rows&nbsp;in&nbsp;the&nbsp;DataFrame&nbsp;are&nbsp;then&nbsp;sorted&nbsp;in&nbsp;descending&nbsp;order&nbsp;of&nbsp;'similarities',&nbsp;and&nbsp;the&nbsp;top&nbsp;'n_results'&nbsp;<br>
+rows&nbsp;are&nbsp;returned&nbsp;as&nbsp;a&nbsp;new&nbsp;DataFrame.<br>
+&nbsp;<br>
+:param&nbsp;df:&nbsp;The&nbsp;input&nbsp;DataFrame,&nbsp;each&nbsp;row&nbsp;of&nbsp;which&nbsp;should&nbsp;have&nbsp;an&nbsp;'ada_embedding'&nbsp;column&nbsp;containing&nbsp;a&nbsp;vector.<br>
+:param&nbsp;searchvector:&nbsp;The&nbsp;vector&nbsp;to&nbsp;compare&nbsp;against&nbsp;the&nbsp;'ada_embedding'&nbsp;of&nbsp;each&nbsp;row&nbsp;in&nbsp;the&nbsp;DataFrame.<br>
+:param&nbsp;n_results:&nbsp;The&nbsp;number&nbsp;of&nbsp;top&nbsp;similar&nbsp;rows&nbsp;to&nbsp;return.<br>
+:return:&nbsp;A&nbsp;DataFrame&nbsp;containing&nbsp;the&nbsp;top&nbsp;'n_results'&nbsp;similar&nbsp;rows&nbsp;to&nbsp;the&nbsp;input&nbsp;vector.</tt></dd></dl>
+ <dl><dt><a name="-get_embedding"><strong>get_embedding</strong></a>(text, engine='text-embedding-ada-002')</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;in&nbsp;a&nbsp;piece&nbsp;of&nbsp;text&nbsp;and&nbsp;a&nbsp;model&nbsp;engine&nbsp;as&nbsp;input&nbsp;parameters,&nbsp;and&nbsp;returns&nbsp;an&nbsp;embedding&nbsp;for&nbsp;the&nbsp;input&nbsp;text.&nbsp;<br>
+It&nbsp;utilizes&nbsp;OpenAI's&nbsp;Embedding&nbsp;API&nbsp;to&nbsp;generate&nbsp;the&nbsp;embedding&nbsp;based&nbsp;on&nbsp;the&nbsp;specified&nbsp;model.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;first&nbsp;replaces&nbsp;newline&nbsp;characters&nbsp;in&nbsp;the&nbsp;input&nbsp;text&nbsp;with&nbsp;spaces,&nbsp;as&nbsp;the&nbsp;embedding&nbsp;models&nbsp;typically&nbsp;<br>
+handle&nbsp;single&nbsp;continuous&nbsp;strings&nbsp;of&nbsp;text.<br>
+&nbsp;<br>
+:param&nbsp;text:&nbsp;The&nbsp;input&nbsp;text&nbsp;for&nbsp;which&nbsp;to&nbsp;generate&nbsp;an&nbsp;embedding.<br>
+:param&nbsp;engine:&nbsp;The&nbsp;model&nbsp;engine&nbsp;to&nbsp;use&nbsp;for&nbsp;generating&nbsp;the&nbsp;embedding.&nbsp;Default&nbsp;is&nbsp;'text-embedding-ada-002'.<br>
+:return:&nbsp;The&nbsp;generated&nbsp;embedding&nbsp;for&nbsp;the&nbsp;input&nbsp;text.</tt></dd></dl>
+ <dl><dt><a name="-get_search_vector"><strong>get_search_vector</strong></a>(text)</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;as&nbsp;input&nbsp;a&nbsp;piece&nbsp;of&nbsp;text&nbsp;and&nbsp;returns&nbsp;an&nbsp;embedding&nbsp;vector&nbsp;for&nbsp;the&nbsp;input&nbsp;text.&nbsp;<br>
+It&nbsp;utilizes&nbsp;the&nbsp;'get_embedding'&nbsp;function&nbsp;to&nbsp;generate&nbsp;the&nbsp;<br>
+embedding&nbsp;vector.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;is&nbsp;a&nbsp;convenience&nbsp;wrapper&nbsp;around&nbsp;the&nbsp;'get_embedding'&nbsp;function,&nbsp;simplifying&nbsp;its&nbsp;use&nbsp;by&nbsp;<br>
+directly&nbsp;passing&nbsp;the&nbsp;input&nbsp;text&nbsp;and&nbsp;relying&nbsp;on&nbsp;the&nbsp;'get_embedding'&nbsp;function's&nbsp;default&nbsp;parameters&nbsp;<br>
+for&nbsp;generating&nbsp;the&nbsp;embedding.<br>
+&nbsp;<br>
+:param&nbsp;text:&nbsp;The&nbsp;input&nbsp;text&nbsp;for&nbsp;which&nbsp;to&nbsp;generate&nbsp;an&nbsp;embedding&nbsp;vector.<br>
+:return:&nbsp;The&nbsp;embedding&nbsp;vector&nbsp;for&nbsp;the&nbsp;input&nbsp;text.</tt></dd></dl>
+ <dl><dt><a name="-query_extended_llm"><strong>query_extended_llm</strong></a>(text, index_filename, model='gpt-4')</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;as&nbsp;input&nbsp;a&nbsp;piece&nbsp;of&nbsp;text,&nbsp;the&nbsp;filename&nbsp;of&nbsp;a&nbsp;CSV&nbsp;file&nbsp;containing&nbsp;indexed&nbsp;data,&nbsp;<br>
+and&nbsp;an&nbsp;optional&nbsp;AI&nbsp;model&nbsp;to&nbsp;use.&nbsp;It&nbsp;queries&nbsp;the&nbsp;OpenAI&nbsp;language&nbsp;model&nbsp;with&nbsp;a&nbsp;context&nbsp;derived&nbsp;from&nbsp;<br>
+the&nbsp;most&nbsp;similar&nbsp;data&nbsp;items&nbsp;to&nbsp;the&nbsp;input&nbsp;text,&nbsp;and&nbsp;a&nbsp;prompt&nbsp;derived&nbsp;from&nbsp;the&nbsp;input&nbsp;text&nbsp;itself.&nbsp;<br>
+It&nbsp;returns&nbsp;the&nbsp;response&nbsp;from&nbsp;the&nbsp;language&nbsp;model.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;first&nbsp;finds&nbsp;the&nbsp;context&nbsp;for&nbsp;the&nbsp;input&nbsp;text&nbsp;using&nbsp;the&nbsp;find_context&nbsp;function.&nbsp;It&nbsp;then&nbsp;<br>
+loads&nbsp;environment&nbsp;variables&nbsp;from&nbsp;a&nbsp;.env&nbsp;file,&nbsp;including&nbsp;the&nbsp;OpenAI&nbsp;API&nbsp;key.&nbsp;<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;then&nbsp;enters&nbsp;a&nbsp;loop&nbsp;where&nbsp;it&nbsp;attempts&nbsp;to&nbsp;query&nbsp;the&nbsp;language&nbsp;model&nbsp;with&nbsp;the&nbsp;context&nbsp;and&nbsp;<br>
+the&nbsp;input&nbsp;text&nbsp;as&nbsp;a&nbsp;prompt.&nbsp;If&nbsp;it&nbsp;encounters&nbsp;an&nbsp;exception&nbsp;during&nbsp;this&nbsp;process,&nbsp;it&nbsp;waits&nbsp;for&nbsp;5&nbsp;seconds&nbsp;<br>
+and&nbsp;then&nbsp;tries&nbsp;again,&nbsp;up&nbsp;to&nbsp;a&nbsp;maximum&nbsp;of&nbsp;10&nbsp;attempts.<br>
+&nbsp;<br>
+If&nbsp;the&nbsp;function&nbsp;is&nbsp;able&nbsp;to&nbsp;successfully&nbsp;query&nbsp;the&nbsp;language&nbsp;model,&nbsp;it&nbsp;returns&nbsp;the&nbsp;model's&nbsp;response&nbsp;as&nbsp;<br>
+a&nbsp;string.&nbsp;If&nbsp;it&nbsp;is&nbsp;unable&nbsp;to&nbsp;do&nbsp;so&nbsp;after&nbsp;10&nbsp;attempts,&nbsp;it&nbsp;prints&nbsp;an&nbsp;error&nbsp;message&nbsp;and&nbsp;terminates&nbsp;the&nbsp;<br>
+program.<br>
+&nbsp;<br>
+:param&nbsp;text:&nbsp;The&nbsp;input&nbsp;text&nbsp;for&nbsp;which&nbsp;to&nbsp;query&nbsp;the&nbsp;language&nbsp;model.<br>
+:param&nbsp;index_filename:&nbsp;The&nbsp;filename&nbsp;of&nbsp;the&nbsp;CSV&nbsp;file&nbsp;containing&nbsp;the&nbsp;indexed&nbsp;data.<br>
+:param&nbsp;model:&nbsp;The&nbsp;AI&nbsp;model&nbsp;to&nbsp;use&nbsp;for&nbsp;the&nbsp;query.&nbsp;Default&nbsp;is&nbsp;'gpt-4'.<br>
+:return:&nbsp;The&nbsp;response&nbsp;from&nbsp;the&nbsp;language&nbsp;model.</tt></dd></dl>
+ <dl><dt><a name="-read_and_process_csv"><strong>read_and_process_csv</strong></a>(index_filename)</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;as&nbsp;input&nbsp;the&nbsp;filename&nbsp;of&nbsp;a&nbsp;CSV&nbsp;file&nbsp;and&nbsp;reads&nbsp;this&nbsp;file&nbsp;into&nbsp;a&nbsp;Pandas&nbsp;DataFrame.&nbsp;<br>
+It&nbsp;then&nbsp;processes&nbsp;the&nbsp;'ada_embedding'&nbsp;column&nbsp;of&nbsp;the&nbsp;DataFrame,&nbsp;converting&nbsp;the&nbsp;string&nbsp;representations&nbsp;<br>
+of&nbsp;embeddings&nbsp;stored&nbsp;in&nbsp;this&nbsp;column&nbsp;back&nbsp;into&nbsp;actual&nbsp;Numpy&nbsp;array&nbsp;objects.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;first&nbsp;reads&nbsp;the&nbsp;CSV&nbsp;file&nbsp;using&nbsp;Pandas'&nbsp;read_csv&nbsp;function,&nbsp;creating&nbsp;a&nbsp;DataFrame&nbsp;where&nbsp;each&nbsp;<br>
+row&nbsp;corresponds&nbsp;to&nbsp;a&nbsp;data&nbsp;item&nbsp;from&nbsp;the&nbsp;CSV&nbsp;file&nbsp;and&nbsp;each&nbsp;column&nbsp;corresponds&nbsp;to&nbsp;a&nbsp;field&nbsp;in&nbsp;the&nbsp;data&nbsp;items.<br>
+&nbsp;<br>
+It&nbsp;then&nbsp;applies&nbsp;the&nbsp;eval&nbsp;function&nbsp;to&nbsp;each&nbsp;item&nbsp;in&nbsp;the&nbsp;'ada_embedding'&nbsp;column&nbsp;to&nbsp;convert&nbsp;the&nbsp;string&nbsp;<br>
+representations&nbsp;of&nbsp;the&nbsp;embeddings&nbsp;back&nbsp;into&nbsp;list&nbsp;objects.&nbsp;These&nbsp;lists&nbsp;are&nbsp;then&nbsp;further&nbsp;converted&nbsp;into&nbsp;<br>
+Numpy&nbsp;arrays&nbsp;using&nbsp;the&nbsp;np.array&nbsp;function.&nbsp;This&nbsp;processed&nbsp;'ada_embedding'&nbsp;column&nbsp;replaces&nbsp;the&nbsp;original&nbsp;<br>
+column&nbsp;in&nbsp;the&nbsp;DataFrame.<br>
+&nbsp;<br>
+:param&nbsp;index_filename:&nbsp;The&nbsp;filename&nbsp;of&nbsp;the&nbsp;CSV&nbsp;file&nbsp;to&nbsp;read.<br>
+:return:&nbsp;The&nbsp;DataFrame&nbsp;created&nbsp;from&nbsp;the&nbsp;CSV&nbsp;file,&nbsp;with&nbsp;the&nbsp;'ada_embedding'&nbsp;column&nbsp;processed.</tt></dd></dl>
+ <dl><dt><a name="-split_text_into_blocks"><strong>split_text_into_blocks</strong></a>(text, limit=4000)</dt><dd><tt>This&nbsp;function&nbsp;splits&nbsp;a&nbsp;given&nbsp;text&nbsp;into&nbsp;chunks,&nbsp;or&nbsp;"blocks",&nbsp;each&nbsp;containing&nbsp;a&nbsp;certain&nbsp;number&nbsp;of&nbsp;words&nbsp;specified&nbsp;by&nbsp;the&nbsp;'limit'&nbsp;parameter.&nbsp;It's&nbsp;particularly&nbsp;designed&nbsp;for&nbsp;use&nbsp;with&nbsp;GPT-3.5&nbsp;(limit&nbsp;of&nbsp;2000&nbsp;words)&nbsp;and&nbsp;GPT-4&nbsp;(limit&nbsp;of&nbsp;4000&nbsp;words).<br>
+Each&nbsp;block&nbsp;is&nbsp;constructed&nbsp;by&nbsp;sequentially&nbsp;adding&nbsp;words&nbsp;from&nbsp;the&nbsp;input&nbsp;text&nbsp;until&nbsp;the&nbsp;block&nbsp;size&nbsp;(the&nbsp;number&nbsp;of&nbsp;words&nbsp;in&nbsp;the&nbsp;block)&nbsp;reaches&nbsp;the&nbsp;limit.&nbsp;If&nbsp;adding&nbsp;another&nbsp;word&nbsp;would&nbsp;exceed&nbsp;the&nbsp;limit,&nbsp;the&nbsp;function&nbsp;checks&nbsp;for&nbsp;the&nbsp;last&nbsp;sentence&nbsp;or&nbsp;line&nbsp;delimiter&nbsp;in&nbsp;the&nbsp;current&nbsp;block&nbsp;(a&nbsp;period&nbsp;or&nbsp;newline&nbsp;character),&nbsp;then&nbsp;separates&nbsp;the&nbsp;block&nbsp;at&nbsp;that&nbsp;delimiter.<br>
+If&nbsp;there&nbsp;is&nbsp;no&nbsp;delimiter&nbsp;in&nbsp;the&nbsp;current&nbsp;block,&nbsp;the&nbsp;entire&nbsp;block&nbsp;is&nbsp;added&nbsp;to&nbsp;the&nbsp;list&nbsp;of&nbsp;blocks&nbsp;and&nbsp;the&nbsp;next&nbsp;word&nbsp;starts&nbsp;a&nbsp;new&nbsp;block.&nbsp;If&nbsp;a&nbsp;delimiter&nbsp;is&nbsp;found,&nbsp;the&nbsp;block&nbsp;is&nbsp;split&nbsp;at&nbsp;the&nbsp;delimiter,&nbsp;and&nbsp;the&nbsp;remaining&nbsp;text&nbsp;(if&nbsp;any)&nbsp;is&nbsp;added&nbsp;to&nbsp;the&nbsp;next&nbsp;block&nbsp;along&nbsp;with&nbsp;the&nbsp;next&nbsp;word.<br>
+The&nbsp;function&nbsp;returns&nbsp;a&nbsp;list&nbsp;of&nbsp;blocks.<br>
+:param&nbsp;text:&nbsp;The&nbsp;input&nbsp;text&nbsp;to&nbsp;be&nbsp;split&nbsp;into&nbsp;blocks.<br>
+:param&nbsp;limit:&nbsp;The&nbsp;maximum&nbsp;number&nbsp;of&nbsp;words&nbsp;allowed&nbsp;in&nbsp;each&nbsp;block.&nbsp;Default&nbsp;is&nbsp;4000.<br>
+:return:&nbsp;A&nbsp;list&nbsp;of&nbsp;text&nbsp;blocks&nbsp;obtained&nbsp;from&nbsp;the&nbsp;input&nbsp;text.</tt></dd></dl>
+ <dl><dt><a name="-validate_and_get_combined"><strong>validate_and_get_combined</strong></a>(res)</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;a&nbsp;DataFrame&nbsp;as&nbsp;input,&nbsp;performs&nbsp;several&nbsp;validation&nbsp;checks&nbsp;on&nbsp;it,&nbsp;<br>
+and&nbsp;then&nbsp;extracts&nbsp;and&nbsp;returns&nbsp;the&nbsp;combined&nbsp;data&nbsp;from&nbsp;the&nbsp;'Datas'&nbsp;column&nbsp;of&nbsp;the&nbsp;DataFrame.<br>
+&nbsp;<br>
+The&nbsp;function&nbsp;first&nbsp;checks&nbsp;if&nbsp;the&nbsp;'Datas'&nbsp;column&nbsp;exists&nbsp;in&nbsp;the&nbsp;DataFrame.&nbsp;If&nbsp;it&nbsp;does&nbsp;not,&nbsp;<br>
+a&nbsp;ValueError&nbsp;is&nbsp;raised.&nbsp;It&nbsp;then&nbsp;checks&nbsp;if&nbsp;the&nbsp;DataFrame&nbsp;is&nbsp;empty.&nbsp;If&nbsp;it&nbsp;is,&nbsp;a&nbsp;ValueError&nbsp;<br>
+is&nbsp;raised.&nbsp;Finally,&nbsp;it&nbsp;checks&nbsp;if&nbsp;the&nbsp;index&nbsp;of&nbsp;the&nbsp;DataFrame&nbsp;is&nbsp;of&nbsp;type&nbsp;'int64'.&nbsp;If&nbsp;it&nbsp;is&nbsp;<br>
+not,&nbsp;a&nbsp;ValueError&nbsp;is&nbsp;raised.<br>
+&nbsp;<br>
+Once&nbsp;these&nbsp;validation&nbsp;checks&nbsp;have&nbsp;passed,&nbsp;the&nbsp;function&nbsp;concatenates&nbsp;all&nbsp;the&nbsp;strings&nbsp;in&nbsp;the&nbsp;<br>
+'Datas'&nbsp;column&nbsp;of&nbsp;the&nbsp;DataFrame,&nbsp;with&nbsp;each&nbsp;string&nbsp;separated&nbsp;by&nbsp;a&nbsp;newline&nbsp;character.&nbsp;This&nbsp;combined&nbsp;<br>
+string&nbsp;is&nbsp;then&nbsp;returned.<br>
+&nbsp;<br>
+:param&nbsp;res:&nbsp;The&nbsp;input&nbsp;DataFrame&nbsp;to&nbsp;validate&nbsp;and&nbsp;extract&nbsp;combined&nbsp;data&nbsp;from.<br>
+:return:&nbsp;A&nbsp;string&nbsp;consisting&nbsp;of&nbsp;all&nbsp;the&nbsp;data&nbsp;from&nbsp;the&nbsp;'Datas'&nbsp;column&nbsp;of&nbsp;the&nbsp;DataFrame,&nbsp;concatenated&nbsp;with&nbsp;newline&nbsp;characters.</tt></dd></dl>
+ <dl><dt><a name="-write_blocks_to_csv"><strong>write_blocks_to_csv</strong></a>(blocks, path, filename)</dt><dd><tt>This&nbsp;function&nbsp;takes&nbsp;a&nbsp;list&nbsp;of&nbsp;blocks&nbsp;(data&nbsp;items)&nbsp;and&nbsp;a&nbsp;filename&nbsp;as&nbsp;input&nbsp;parameters,&nbsp;then&nbsp;writes&nbsp;these&nbsp;blocks&nbsp;into&nbsp;a&nbsp;CSV&nbsp;file&nbsp;specified&nbsp;by&nbsp;the&nbsp;given&nbsp;filename.<br>
+The&nbsp;blocks&nbsp;are&nbsp;written&nbsp;row&nbsp;by&nbsp;row&nbsp;in&nbsp;the&nbsp;CSV&nbsp;file,&nbsp;with&nbsp;each&nbsp;block&nbsp;making&nbsp;up&nbsp;a&nbsp;single&nbsp;row.&nbsp;<br>
+The&nbsp;CSV&nbsp;file&nbsp;is&nbsp;created&nbsp;with&nbsp;a&nbsp;specific&nbsp;encoding&nbsp;(UTF-8),&nbsp;and&nbsp;using&nbsp;specific&nbsp;settings&nbsp;for&nbsp;delimiter&nbsp;and&nbsp;quotechar&nbsp;for&nbsp;CSV&nbsp;data&nbsp;formatting.<br>
+:param&nbsp;blocks:&nbsp;A&nbsp;list&nbsp;of&nbsp;data&nbsp;items&nbsp;to&nbsp;be&nbsp;written&nbsp;into&nbsp;the&nbsp;CSV&nbsp;file.<br>
+:param&nbsp;filename:&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;CSV&nbsp;file&nbsp;where&nbsp;the&nbsp;data&nbsp;should&nbsp;be&nbsp;written.</tt></dd></dl>
+</td></tr></table>
+</body></html>

@@ -1,0 +1,4 @@
+extended_llm
+A simplified version of a second brain for neural language models using simple CSV files containing embeddings.
+
+This Python code implements a system for understanding and processing natural language to facilitate information retrieval based on semantics rather than traditional keyword-based search. It uses the OpenAI Embedding API to generate text embeddings from blocks of text. These embeddings are stored in CSV files that constitute a semantic index. A text query is compared to the index's embeddings to find the most similar text blocks. These similar text blocks provide a context that is used to query a neural language model such as GPT-4. The language model's response can then be used to complete or generate new knowledge from the original query.
