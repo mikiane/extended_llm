@@ -1,6 +1,6 @@
-extended_llm
+# extended_llm
 
-# WORK IN PROGRESS #
+## WORK IN PROGRESS 
 
 A simplified version of a second brain for neural language models using simple CSV files containing embeddings.
 
