@@ -1,4 +1,4 @@
-# extended_llm
+# extended_llm (Alter Brain)
 
 ## WORK IN PROGRESS 
 
