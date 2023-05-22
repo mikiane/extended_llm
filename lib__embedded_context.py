@@ -341,7 +341,8 @@ def create_embeddings(path, filename):
        
     # Open the input CSV file and read it into a Pandas DataFrame.
     # Read the CSV file using the ';' separator and ignoring incorrect lines.
-    df_full = pd.read_csv(path + filename, sep=';', error_bad_lines=False, encoding='utf-8')
+    df_full = pd.read_csv(path + filename, sep=';', on_bad_lines='skip', encoding='utf-8')
+
     
     ############################################################################################################      
     #### DEBUG
