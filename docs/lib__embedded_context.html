@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>lib__embedded_context.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>lib__embedded_context.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <hr />
+<p>Project: Semantic Search Module for the Alter Brain project
+File:    lib__embedded_context.py</p>
+<p>This lib is the Semantic Search Module for the Alter Brain project. It implements a 
+system for understanding and processing natural language to facilitate 
+information retrieval based on semantics rather than traditional keyword-based search.</p>
+<p>Author:  Michel Levy Provencal
+Brightness.ai - 2023 - contact@brightness.fr</p>
+<hr />
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">openai</span>
+<span class="kn">from</span> <span class="nn">openai.embeddings_utils</span> <span class="kn">import</span> <span class="n">get_embedding</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GPT2TokenizerFast</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">PyPDF2</span>
+<span class="kn">import</span> <span class="nn">docx</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">xlrd</span>
+<span class="kn">import</span> <span class="nn">pptx</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">pytesseract</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">openpyxl</span> <span class="kn">import</span> <span class="n">load_workbook</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h6></h6>
+<pre><code>## TOOLS
+</code></pre>
+<h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Fonction pour générer un nom de fichier unique</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">generate_unique_filename</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Generates a unique filename by appending a random number between 1 and 9999 to the given prefix,
+and then appending a specified suffix.
+:param prefix: The prefix of the filename.
+:param suffix: The suffix of the filename (usually the file extension).
+:return: A string representing a unique filename with the format &lsquo;prefix_randomNumber.suffix&rsquo;.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">random_number</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9999</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">random_number</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier PDF en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_pdf_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Converts a PDF file to text using PyPDF2.
+This function reads a PDF file, extracts the text from each page, and then concatenates the extracted text from all pages into a single string.
+:param file_path: Path to the PDF file.
+:return: The text extracted from the PDF file.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">pdf_reader</span> <span class="o">=</span> <span class="n">PyPDF2</span><span class="o">.</span><span class="n">PdfReader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">page_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pdf_reader</span><span class="o">.</span><span class="n">pages</span><span class="p">)):</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">pdf_reader</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="n">page_num</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">page</span><span class="o">.</span><span class="n">extract_text</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier .docx en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_docx_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Converts the contents of a .docx file into plain text.</p>
+<p>This function takes as input a path to a .docx file, opens the file,
+and extracts the text from each paragraph in the document. The extracted
+text from each paragraph is then joined together with newline characters
+in between each paragraph to form a single string of text.</p>
+<p>:param file_path: The path to the .docx file.
+:return: A single string containing the text of the .docx file.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">doc</span> <span class="o">=</span> <span class="n">docx</span><span class="o">.</span><span class="n">Document</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">paragraph</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier CSV en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_csv_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Converts a CSV file into a text format.
+:param file_path: The path to the CSV file.
+:return: A string representation of the CSV file.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">csv_reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_reader</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier JSON en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_json_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Converts a JSON file into a formatted text string.
+:param file_path: The path to the JSON file.
+:return: A string representing the JSON data, formatted with indentation.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier Excel en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_excel_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Converts an Excel workbook into a text format. Each cell is separated by a comma,
+and each row is separated by a new line.</p>
+<p>:param file_path: The path of the Excel file.
+:return: A string representing the content of the Excel file.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">workbook</span> <span class="o">=</span> <span class="n">load_workbook</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">sheet</span> <span class="ow">in</span> <span class="n">workbook</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sheet</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">row</span><span class="p">])</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier .pptx en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_pptx_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Converts the content of a PowerPoint presentation (.pptx) into text.
+:param file_path: The path to the .pptx file.
+:return: A string containing the text content of the presentation.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">presentation</span> <span class="o">=</span> <span class="n">pptx</span><span class="o">.</span><span class="n">Presentation</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">slide</span> <span class="ow">in</span> <span class="n">presentation</span><span class="o">.</span><span class="n">slides</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">slide</span><span class="o">.</span><span class="n">shapes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">shape</span><span class="o">.</span><span class="n">has_text_frame</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">shape</span><span class="o">.</span><span class="n">text_frame</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier XML en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_xml_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>Convertit le contenu d&rsquo;un fichier XML en texte brut.
+:param file_path: Le chemin vers le fichier XML.
+:return: Le texte extrait du fichier XML.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir un fichier HTML en texte</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_html_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      <p>Converts an HTML file into a plain text by removing all the HTML tags.
+:param file_path: The path to the HTML file.
+:return: The text content of the HTML file.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      <hr />
+<p>Fonction pour convertir une image en texte à l&rsquo;aide de l&rsquo;OCR</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_image_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      <p>Converts an image into text using Optical Character Recognition (OCR).
+:param file_path: Path to the image file.
+:return: Extracted text from the image.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">pytesseract</span><span class="o">.</span><span class="n">image_to_string</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s2">&quot;eng&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      <p>Converts the content of a text file to UTF-8 and returns a text string.
+:param file_path: The path to the text file.
+:return: The text extracted from the text file.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_text_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">text</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-25'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-25'>#</a>
+      </div>
+      <hr />
+<p>Function that concat all files contained in a folder in a text</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">concat_files_in_text</span><span class="p">(</span><span class="n">path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-26'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-26'>#</a>
+      </div>
+      <p>Concatenates the files of a directory into a single text.
+:param path: Directory path.
+:return: Concatenated text.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">))]</span>
+    <span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">texts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-27'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      <hr />
+<p>Function that split the txt file into blocks. Uses batch (limit) of 2000 words with gpt3.5 and 4000 with gpt4</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">split_text_into_blocks</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">4000</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
+      </div>
+      <p>This function splits a given text into chunks, or &ldquo;blocks&rdquo;, each containing a certain number of words specified by the &lsquo;limit&rsquo; parameter. It&rsquo;s particularly designed for use with GPT-3.5 (limit of 2000 words) and GPT-4 (limit of 4000 words).
+Each block is constructed by sequentially adding words from the input text until the block size (the number of words in the block) reaches the limit. If adding another word would exceed the limit, the function checks for the last sentence or line delimiter in the current block (a period or newline character), then separates the block at that delimiter.
+If there is no delimiter in the current block, the entire block is added to the list of blocks and the next word starts a new block. If a delimiter is found, the block is split at the delimiter, and the remaining text (if any) is added to the next block along with the next word.
+The function returns a list of blocks.
+:param text: The input text to be split into blocks.
+:param limit: The maximum number of words allowed in each block. Default is 4000.
+:return: A list of text blocks obtained from the input text.</p>
+<h2>TODO : Adapt the limit to other LLMs (LLAMAS, All-GPT, etc.)</h2>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    
+    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_block</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_block</span> <span class="o">+</span> <span class="n">word</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="p">:</span>
+            <span class="n">current_block</span> <span class="o">+=</span> <span class="n">word</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">last_delimiter_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">current_block</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;. &quot;</span><span class="p">),</span> <span class="n">current_block</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">last_delimiter_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_block</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">current_block</span> <span class="o">=</span> <span class="n">word</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">delimiter</span> <span class="o">=</span> <span class="n">current_block</span><span class="p">[</span><span class="n">last_delimiter_index</span><span class="p">]</span>
+                <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_block</span><span class="p">[:</span><span class="n">last_delimiter_index</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">delimiter</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">current_block</span> <span class="o">=</span> <span class="n">current_block</span><span class="p">[</span><span class="n">last_delimiter_index</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">delimiter</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="k">else</span> <span class="mi">1</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">word</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+
+    <span class="k">if</span> <span class="n">current_block</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_block</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">blocks</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-29'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-29'>#</a>
+      </div>
+      <hr />
+<p>Function that write blocks into filename</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">write_blocks_to_csv</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-30'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-30'>#</a>
+      </div>
+      <p>This function takes a list of blocks (data items) and a filename as input parameters, then writes these blocks into a CSV file specified by the given filename.
+The blocks are written row by row in the CSV file, with each block making up a single row. 
+The CSV file is created with a specific encoding (UTF-8), and using specific settings for delimiter and quotechar for CSV data formatting.
+:param blocks: A list of data items to be written into the CSV file.
+:param filename: The name of the CSV file where the data should be written.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">csvwriter</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_MINIMAL</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-31'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-31'>#</a>
+      </div>
+      <p>Write the header</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="n">csvwriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;Datas&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+            <span class="n">csvwriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">block</span><span class="p">])</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-32'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-32'>#</a>
+      </div>
+      <hr />
+<p>Function that gets the embedding for a given text</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;text-embedding-ada-002&quot;</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-33'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-33'>#</a>
+      </div>
+      <p>This function takes in a piece of text and a model engine as input parameters, and returns an embedding for the input text. 
+It utilizes OpenAI&rsquo;s Embedding API to generate the embedding based on the specified model.</p>
+<p>The function first replaces newline characters in the input text with spaces, as the embedding models typically 
+handle single continuous strings of text.</p>
+<p>:param text: The input text for which to generate an embedding.
+:param engine: The model engine to use for generating the embedding. Default is &lsquo;text-embedding-ada-002&rsquo;.
+:return: The generated embedding for the input text.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-34'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-34'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+<h3>DEBUG</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get embedding for &quot;</span> <span class="o">+</span> <span class="n">text</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-35'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-35'>#</a>
+      </div>
+      <h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">return</span> <span class="n">openai</span><span class="o">.</span><span class="n">Embedding</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">input</span> <span class="o">=</span> <span class="p">[</span><span class="n">text</span><span class="p">],</span> <span class="n">model</span><span class="o">=</span><span class="n">engine</span><span class="p">)[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;embedding&#39;</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-36'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-36'>#</a>
+      </div>
+      <hr />
+<p>Function that creates embeddings for text data in a specified CSV file</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">create_embeddings</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-37'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-37'>#</a>
+      </div>
+      <p>This function reads text data from a specified CSV file and creates embeddings for each text entry using OpenAI&rsquo;s
+Embedding API. It then saves the generated embeddings back to a new CSV file.</p>
+<p>The function uses a GPT-2 tokenizer to tokenize the text data. It then filters out rows where the number of tokens
+exceeds 8000 and keeps the last 2000 records. The function also drops rows with missing values from the data.</p>
+<p>The embeddings are generated using the &lsquo;text-embedding-ada-002&rsquo; model by default, and the generated embeddings are 
+saved as a new column in the DataFrame.</p>
+<p>The function finally saves the DataFrame, with the embeddings, to a new CSV file.</p>
+<p>:param path: The directory path where the input and output CSV files are located.
+:param filename: The name of the input CSV file from which to read the text data.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">load_dotenv</span><span class="p">(</span><span class="s2">&quot;.env&quot;</span><span class="p">)</span> <span class="c1"># Load the environment variables from the .env file.</span>
+    <span class="n">openai</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">)</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">GPT2TokenizerFast</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-38'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-38'>#</a>
+      </div>
+      <p>Open the input CSV file and read it into a Pandas DataFrame.
+Read the CSV file using the &lsquo;;&rsquo; separator and ignoring incorrect lines.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df_full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">error_bad_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-39'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-39'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+<h3>DEBUG</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file loaded&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-40'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-40'>#</a>
+      </div>
+      <h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-41'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-41'>#</a>
+      </div>
+      <p>rename the dataframe&rsquo;s columns</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span> <span class="o">=</span> <span class="n">df_full</span><span class="p">[[</span><span class="s1">&#39;Datas&#39;</span><span class="p">]]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;df loaded with &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; rows&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-42'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-42'>#</a>
+      </div>
+      <p>remove rows with missing values </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-43'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-43'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+<h3>DEBUG</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;df cleaned with &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; rows&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-44'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-44'>#</a>
+      </div>
+      <h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-45'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-45'>#</a>
+      </div>
+      <p>A new column &lsquo;n_tokens&rsquo; is added to the DataFrame &lsquo;df&rsquo;. The values in this column are computed by applying a 
+lambda function to each value in the &lsquo;Datas&rsquo; column of the DataFrame. 
+This lambda function uses a tokenizer to encode the text data and then counts the number of tokens in the encoded result.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-46'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-46'>#</a>
+      </div>
+      <p>And filter the DataFrame, keeping only the rows where &lsquo;n_tokens&rsquo; is less than 8000.
+It then selects the last 2000 records from this filtered DataFrame. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;n_tokens&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Datas</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">n_tokens</span><span class="o">&lt;</span><span class="mi">8000</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-47'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-47'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+<h3>DEBUG</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;df cleaned with &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; rows&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-48'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-48'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    
+         
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ada_embedding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Datas</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;text-embedding-ada-002&#39;</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-49'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-49'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+<h3>DEBUG</h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;embeddings created&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-50'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-50'>#</a>
+      </div>
+      <h6>#####################################################################################################</h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-51'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-51'>#</a>
+      </div>
+      <p>write the value of the vector from the dataframe in a second CSV file named emb_xxx.csv</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;emb_&quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-52'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-52'>#</a>
+      </div>
+      <hr />
+<p>Function that reads and processes a CSV file and returns a DataFrame</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">read_and_process_csv</span><span class="p">(</span><span class="n">index_filename</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-53'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-53'>#</a>
+      </div>
+      <p>This function takes as input the filename of a CSV file and reads this file into a Pandas DataFrame. 
+It then processes the &lsquo;ada_embedding&rsquo; column of the DataFrame, converting the string representations 
+of embeddings stored in this column back into actual Numpy array objects.</p>
+<p>The function first reads the CSV file using Pandas&rsquo; read_csv function, creating a DataFrame where each 
+row corresponds to a data item from the CSV file and each column corresponds to a field in the data items.</p>
+<p>It then applies the eval function to each item in the &lsquo;ada_embedding&rsquo; column to convert the string 
+representations of the embeddings back into list objects. These lists are then further converted into 
+Numpy arrays using the np.array function. This processed &lsquo;ada_embedding&rsquo; column replaces the original 
+column in the DataFrame.</p>
+<p>:param index_filename: The filename of the CSV file to read.
+:return: The DataFrame created from the CSV file, with the &lsquo;ada_embedding&rsquo; column processed.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">index_filename</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ada_embedding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">ada_embedding</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">eval</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-54'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-54'>#</a>
+      </div>
+      <hr />
+<p>Function that gets an embedding vector for a given text</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">get_search_vector</span><span class="p">(</span><span class="n">text</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-55'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-55'>#</a>
+      </div>
+      <p>This function takes as input a piece of text and returns an embedding vector for the input text. 
+It utilizes the &lsquo;get_embedding&rsquo; function to generate the 
+embedding vector.</p>
+<p>The function is a convenience wrapper around the &lsquo;get_embedding&rsquo; function, simplifying its use by 
+directly passing the input text and relying on the &lsquo;get_embedding&rsquo; function&rsquo;s default parameters 
+for generating the embedding.</p>
+<p>:param text: The input text for which to generate an embedding vector.
+:return: The embedding vector for the input text.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">return</span> <span class="n">get_embedding</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-56'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-56'>#</a>
+      </div>
+      <hr />
+<p>Function that finds similar rows in a DataFrame based on an input vector</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">find_similar_rows</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">searchvector</span><span class="p">,</span> <span class="n">n_results</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-57'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-57'>#</a>
+      </div>
+      <p>This function takes as input a DataFrame, a search vector, and a number of results to return.
+It calculates the cosine similarity between the search vector and the embeddings in the DataFrame. 
+The rows with the highest cosine similarity are then sorted and the top &lsquo;n_results&rsquo; rows are returned.</p>
+<p>The function adds a new column, &lsquo;similarities&rsquo;, to the DataFrame. For each row, it computes the dot 
+product between the &lsquo;ada_embedding&rsquo; of the row and the search vector, which is equivalent to calculating 
+the cosine similarity when the vectors are normalized.</p>
+<p>The rows in the DataFrame are then sorted in descending order of &lsquo;similarities&rsquo;, and the top &lsquo;n_results&rsquo; 
+rows are returned as a new DataFrame.</p>
+<p>:param df: The input DataFrame, each row of which should have an &lsquo;ada_embedding&rsquo; column containing a vector.
+:param searchvector: The vector to compare against the &lsquo;ada_embedding&rsquo; of each row in the DataFrame.
+:param n_results: The number of top similar rows to return.
+:return: A DataFrame containing the top &lsquo;n_results&rsquo; similar rows to the input vector.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;similarities&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">ada_embedding</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">searchvector</span><span class="p">))</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;similarities&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n_results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-58'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-58'>#</a>
+      </div>
+      <hr />
+<p>Function that validates a DataFrame and extracts the combined data</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">validate_and_get_combined</span><span class="p">(</span><span class="n">res</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-59'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-59'>#</a>
+      </div>
+      <p>This function takes a DataFrame as input, performs several validation checks on it, 
+and then extracts and returns the combined data from the &lsquo;Datas&rsquo; column of the DataFrame.</p>
+<p>The function first checks if the &lsquo;Datas&rsquo; column exists in the DataFrame. If it does not, 
+a ValueError is raised. It then checks if the DataFrame is empty. If it is, a ValueError 
+is raised. Finally, it checks if the index of the DataFrame is of type &lsquo;int64&rsquo;. If it is 
+not, a ValueError is raised.</p>
+<p>Once these validation checks have passed, the function concatenates all the strings in the 
+&lsquo;Datas&rsquo; column of the DataFrame, with each string separated by a newline character. This combined 
+string is then returned.</p>
+<p>:param res: The input DataFrame to validate and extract combined data from.
+:return: A string consisting of all the data from the &lsquo;Datas&rsquo; column of the DataFrame, concatenated with newline characters.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    
+    <span class="k">if</span> <span class="s1">&#39;Datas&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;La colonne &#39;Datas&#39; n&#39;existe pas dans le DataFrame&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Le DataFrame est vide&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="s1">&#39;int64&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;L&#39;index du DataFrame n&#39;est pas de type entier&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Datas&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-60'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-60'>#</a>
+      </div>
+      <hr />
+<p>Function that converts all the files in a folder to text and store them in a new subfolder named &lsquo;text&rsquo;</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">create_text_folder</span><span class="p">(</span><span class="n">folder_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-61'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-61'>#</a>
+      </div>
+      <p>TODO: Write documentation</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-62'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-62'>#</a>
+      </div>
+      <p>Folder containing the files to convert</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">source_folder</span> <span class="o">=</span> <span class="n">folder_path</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-63'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-63'>#</a>
+      </div>
+      <p>Destination folder for the converted text files</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">destination_folder</span> <span class="o">=</span> <span class="n">folder_path</span> <span class="o">+</span> <span class="s2">&quot;text_tmp&quot;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-64'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-64'>#</a>
+      </div>
+      <p>List of supported file formats</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">supported_formats</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;.pdf&quot;</span><span class="p">:</span> <span class="n">convert_pdf_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.docx&quot;</span><span class="p">:</span> <span class="n">convert_docx_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.csv&quot;</span><span class="p">:</span> <span class="n">convert_csv_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.json&quot;</span><span class="p">:</span> <span class="n">convert_json_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.xls&quot;</span><span class="p">:</span> <span class="n">convert_excel_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.xlsx&quot;</span><span class="p">:</span> <span class="n">convert_excel_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.pptx&quot;</span><span class="p">:</span> <span class="n">convert_pptx_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.xml&quot;</span><span class="p">:</span> <span class="n">convert_xml_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.html&quot;</span><span class="p">:</span> <span class="n">convert_html_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.jpg&quot;</span><span class="p">:</span> <span class="n">convert_image_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.jpeg&quot;</span><span class="p">:</span> <span class="n">convert_image_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">convert_image_to_text</span><span class="p">,</span>
+        <span class="s2">&quot;.txt&quot;</span><span class="p">:</span> <span class="n">convert_text_to_text</span>
+    <span class="p">}</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-65'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-65'>#</a>
+      </div>
+      <p>Create the destination folder if it doesn&rsquo;t exist</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">destination_folder</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">destination_folder</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-66'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-66'>#</a>
+      </div>
+      <p>Iterate through all the files in the source folder</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">source_folder</span><span class="p">):</span>
+        <span class="n">source_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_folder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">source_file_path</span><span class="p">):</span>
+            <span class="n">file_name_without_ext</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">supported_formats</span><span class="p">:</span>
+                <span class="n">converter</span> <span class="o">=</span> <span class="n">supported_formats</span><span class="p">[</span><span class="n">file_ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">source_file_path</span><span class="p">)</span>
+                <span class="n">destination_file_name</span> <span class="o">=</span> <span class="n">generate_unique_filename</span><span class="p">(</span><span class="n">file_name_without_ext</span><span class="p">,</span> <span class="s2">&quot;txt&quot;</span><span class="p">)</span>
+                <span class="n">destination_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">destination_folder</span><span class="p">,</span> <span class="n">destination_file_name</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination_file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">destination_folder</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-67'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-67'>#</a>
+      </div>
+      <h6></h6>
+<pre><code>## FUNCTIONS TO INDEX &amp; SEARCH EMBEDDINGS
+</code></pre>
+<h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-68'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-68'>#</a>
+      </div>
+      <h1>----------------------------------------------------------------------------</h1>
+<h1>Function that creates a csv index file containing embeddings, from a folder named path.</h1>
+<h1>The index is stored in the same folder, and named : emb_csv_XXX.csv</h1>
+<h1>The function returns the name of the index file : emb_csv_XXX.csv</h1>
+<h1>(while the concatenated text is stored in a txt file named txt_XXX.txt and the csv file containing the blocks is named csv_XXX.csv)</h1>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">build_index</span><span class="p">(</span><span class="n">folder_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-69'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-69'>#</a>
+      </div>
+      <p>This function reads multiple text files from a specified folder, concatenates the text, 
+splits the concatenated text into blocks of specified length, writes these blocks into a CSV file, 
+creates embeddings for each block using the create_embeddings function, and finally, saves the 
+embeddings back to the CSV file.</p>
+<p>The function first generates a random number which is used to create unique filenames for the 
+intermediate text and CSV files. It then reads and concatenates all the text files from the 
+specified folder into a single string of text.</p>
+<p>The function then calls the split_text_into_blocks function to split the text into blocks of 
+up to 4000 characters each. The resulting list of blocks is written to a new CSV file.</p>
+<p>The function then calls the create_embeddings function to create embeddings for each text block 
+in the CSV file. The embeddings are saved back to the CSV file.</p>
+<p>Finally, the function returns the name of the CSV file containing the embeddings.</p>
+<p>:param folder_path: The directory path where the text files are located and where the CSV file will be saved.
+:return: The name of the CSV file containing the embeddings.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-70'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-70'>#</a>
+      </div>
+      <p>transform files into text, create a subfolder named &lsquo;txt&rsquo; and save the text files in it. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">text_folder_path</span> <span class="o">=</span> <span class="n">create_text_folder</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-71'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-71'>#</a>
+      </div>
+      <p>Concatenate files in text</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">text</span> <span class="o">=</span> <span class="n">concat_files_in_text</span><span class="p">(</span><span class="n">text_folder_path</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-72'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-72'>#</a>
+      </div>
+      <p>OLD VERSION : Save text in a csv file named csv(random number).csv
+random_num = random.randint(1000,9999)  # Generates a random number between 1000 and 9999</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-73'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-73'>#</a>
+      </div>
+      <p>Call the function split_text_into_blocks() to split the text into blocks</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">blocks</span> <span class="o">=</span> <span class="n">split_text_into_blocks</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">4000</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-74'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-74'>#</a>
+      </div>
+      <p>Call the function write_blocks_to_csv() to write the blocks into a csv file</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">write_blocks_to_csv</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="n">folder_path</span><span class="p">,</span> <span class="s1">&#39;index.csv&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-75'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-75'>#</a>
+      </div>
+      <p>Create embeddings for the csv file</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">create_embeddings</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="s1">&#39;index.csv&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span><span class="p">(</span><span class="s1">&#39;index created in the file : emb_index.csv&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-76'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-76'>#</a>
+      </div>
+      <hr />
+<p>Function that finds the context for a given query in an index file</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">find_context</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">index_filename</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-77'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-77'>#</a>
+      </div>
+      <p>This function takes as input a piece of text, the filename of a CSV file containing indexed data, 
+and an optional number of results to return. It finds the most similar data items to the input 
+text in the indexed data and returns the combined data from these items.</p>
+<p>The function first loads environment variables from a .env file, including the OpenAI API key. 
+It then reads and processes the indexed data from the CSV file into a DataFrame.</p>
+<p>The function creates an embedding for the input text using the get_search_vector function. 
+This embedding is compared with the embeddings of the data items in the DataFrame to find 
+the most similar items.</p>
+<p>The most similar items are sorted by their similarity scores, and the top &lsquo;n_results&rsquo; items are 
+selected. The combined data from these items is extracted and returned.</p>
+<p>:param text: The input text for which to find similar data items.
+:param index_filename: The filename of the CSV file containing the indexed data.
+:param n_results: The number of most similar data items to return. Default is 3.
+:return: The combined data from the most similar data items.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">load_dotenv</span><span class="p">(</span><span class="s2">&quot;.env&quot;</span><span class="p">)</span>  <span class="c1"># Load the environment variables from the .env file.</span>
+    <span class="n">openai</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_and_process_csv</span><span class="p">(</span><span class="n">index_filename</span><span class="p">)</span>
+
+    <span class="n">searchvector</span> <span class="o">=</span> <span class="n">get_search_vector</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">find_similar_rows</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">searchvector</span><span class="p">,</span> <span class="n">n_results</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">validate_and_get_combined</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-78'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-78'>#</a>
+      </div>
+      <hr />
+<p>Function that queries the OpenAI language model with a context and query</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">query_extended_llm</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">index_filename</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-79'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-79'>#</a>
+      </div>
+      <p>This function takes as input a piece of text, the filename of a CSV file containing indexed data, 
+and an optional AI model to use. It queries the OpenAI language model with a context derived from 
+the most similar data items to the input text, and a prompt derived from the input text itself. 
+It returns the response from the language model.</p>
+<p>The function first finds the context for the input text using the find_context function. It then 
+loads environment variables from a .env file, including the OpenAI API key. </p>
+<p>The function then enters a loop where it attempts to query the language model with the context and 
+the input text as a prompt. If it encounters an exception during this process, it waits for 5 seconds 
+and then tries again, up to a maximum of 10 attempts.</p>
+<p>If the function is able to successfully query the language model, it returns the model&rsquo;s response as 
+a string. If it is unable to do so after 10 attempts, it prints an error message and terminates the 
+program.</p>
+<p>:param text: The input text for which to query the language model.
+:param index_filename: The filename of the CSV file containing the indexed data.
+:param model: The AI model to use for the query. Default is &lsquo;gpt-4&rsquo;.
+:return: The response from the language model.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">context</span> <span class="o">=</span> <span class="n">find_context</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">index_filename</span><span class="p">)</span>
+    <span class="n">load_dotenv</span><span class="p">(</span><span class="s2">&quot;.env&quot;</span><span class="p">)</span> <span class="c1"># Load the environment variables from the .env file.</span>
+
+    <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;Context : &quot;</span> <span class="o">+</span> <span class="n">context</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;Query : &quot;</span> <span class="o">+</span> <span class="n">text</span>
+    
+    <span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">)</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="s2">&quot;Je suis un assistant parlant parfaitement le français et l&#39;anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes.&quot;</span>
+
+    <span class="k">while</span> <span class="n">attempts</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://api.openai.com/v1/chat/completions&#39;</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Bearer </span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">}</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-80'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-80'>#</a>
+      </div>
+      <p>&lsquo;model&rsquo;: &lsquo;gpt-3.5-turbo&rsquo;,</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                <span class="s1">&#39;messages&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">system</span><span class="p">}</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">json_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">json_data</span><span class="p">[</span><span class="s1">&#39;choices&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">error_code</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">error_reason</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erreur : </span><span class="si">{</span><span class="n">error_code</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">error_reason</span><span class="si">}</span><span class="s2">. Nouvel essai dans 5 secondes...&quot;</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Erreur : Echec de la création de la completion après 5 essais&quot;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

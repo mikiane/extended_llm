@@ -1,3 +1,5 @@
 files/
 .env
 __pycache__/
+datas/*
+datas/**/

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>alter_brain_api.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>alter_brain_api.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <hr />
+<p>Project: Flask API for the Alter Brain project
+File:    alter_brain_api.py</p>
+<p>This file is a part of the project &ldquo;Alter Brain&rdquo;
+It&rsquo;s a Flask API to build the index from a folder of files contained in the file sent in the POST request
+and to query the index with a text Request</p>
+<p>Author:  Michel Levy Provencal
+Brightness.ai - 2023 - contact@brightness.fr</p>
+<hr />
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Run your application: You can run your Flask application locally using the command line. To do so, navigate to the directory containing your .py file (e.g., app.py) and run the following command:
+python alter_brain_api.py
+This command will start a Flask development server on your machine. By default, it will be accessible at http://127.0.0.1:5000/ or http://localhost:5000/.
+Send a POST request: You can test the /buildindex route by sending a POST request. You can use tools like Postman or curl for this. The request should include a file in the request body. Here&rsquo;s how you can do it with curl:
+curl -X POST -F &ldquo;file=@path_to_your_file&rdquo; http://localhost:5000/buildindex
+Replace &ldquo;path_to_your_file&rdquo; with the file path you want to send.
+Check the response: After sending the request, you should receive a response from your Flask server. You can inspect this response to ensure it contains the expected information.
+Check server content: Additionally, you can check the content of your server to ensure that the file has been received and processed correctly. For example, you can check if the folder has been created as expected and if the file has been properly extracted or saved.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">lib__embedded_context</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">flask_cors</span> <span class="kn">import</span> <span class="n">CORS</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">import</span> <span class="nn">shutil</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Base folder path</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">base_folder</span> <span class="o">=</span> <span class="s2">&quot;datas/&quot;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Initialize Flask application</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>  <span class="c1"># Enable CORS for the Flask application</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_CONTENT_LENGTH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>  <span class="c1"># Limit the size of uploaded files to 100 MB</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>API buildindex : to build the index from a folder of files contained in the file sent in the POST request</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/buildindex&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">handle_file</span><span class="p">():</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>This function processes the file submitted in the POST request.
+It creates a directory with the name of the file (without the extension) and a timestamp.
+If the file is a zip file, it extracts all the files inside it to the base of the created directory.
+If it&rsquo;s not a zip file, it saves the file to the created directory.
+Finally, it calls the index_folder function with the created directory name.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Vérifier si un fichier a été fourni</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">if</span> <span class="s1">&#39;file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;No file provided&#39;</span><span class="p">}),</span> <span class="mi">400</span>
+
+    <span class="n">uploaded_file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Vérifier si le nom du fichier est vide</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">if</span> <span class="n">uploaded_file</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;No file provided&#39;</span><span class="p">}),</span> <span class="mi">400</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Récupérer le nom de base du fichier et créer un nouveau nom de dossier avec un timestamp</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">base_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">uploaded_file</span><span class="o">.</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">-%H%M%S&quot;</span><span class="p">)</span>
+    <span class="n">folder_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_folder</span><span class="si">}{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">/&quot;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Créer le nouveau dossier</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Si le fichier est un zip, le dézipper</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">if</span> <span class="n">uploaded_file</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">uploaded_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+            <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Si le fichier n&rsquo;est pas un zip, le sauvegarder dans le nouveau dossier</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="n">uploaded_file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">uploaded_file</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Appeler la fonction d&rsquo;indexation sur le nouveau dossier</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">lib__embedded_context</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Créer la réponse JSON</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">res</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;request&#39;</span><span class="p">:</span><span class="s1">&#39;buildindex&#39;</span><span class="p">,</span> <span class="s1">&#39;answer&#39;</span><span class="p">:</span> <span class="n">base_name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">timestamp</span><span class="p">}]</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>NOTE : the index is in the folder : base_folder + base_name + &ldquo;_&rdquo; + timestamp + &ldquo;/&rdquo; + emb_index.csv</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">return</span> <span class="n">response</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>API searchcontext : to search the context of a request in the index (brain id and request are passed in the POST request) </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/searchcontext&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">handle_req</span><span class="p">():</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>This function searches for the context of a request in the index.
+It retrieves the text and index parameters from the POST request form.
+The index filename is constructed based on the provided index parameter.
+It calls the <code>find_context</code> function from the <code>lib__embedded_context</code> module
+with the text, index filename, and number of results.
+The function returns a JSON response containing the search results.</p>
+<p>:return: A JSON response with the search results.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    
+    <span class="n">text</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;brain_id&#39;</span><span class="p">)</span>
+    <span class="n">index_filename</span> <span class="o">=</span> <span class="s2">&quot;datas/&quot;</span> <span class="o">+</span> <span class="n">index</span> <span class="o">+</span> <span class="s2">&quot;/emb_index.csv&quot;</span>
+    
+    <span class="n">context</span> <span class="o">=</span> <span class="n">lib__embedded_context</span><span class="o">.</span><span class="n">find_context</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">index_filename</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;request&#39;</span><span class="p">:</span><span class="s1">&#39;summarize&#39;</span><span class="p">,</span><span class="s1">&#39;answer&#39;</span><span class="p">:</span><span class="n">context</span><span class="p">}]</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    
+    
+    
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

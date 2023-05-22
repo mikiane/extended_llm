@@ -1,10 +1,10 @@
 
 
 # ----------------------------------------------------------------------------
-# Project: Semantic Search Module
+# Project: Semantic Search Module for the Alter Brain project
 # File:    lib__embedded_context.py
 # 
-# This lib is part of the Semantic Search Module project. It implements a 
+# This lib is the Semantic Search Module for the Alter Brain project. It implements a 
 # system for understanding and processing natural language to facilitate 
 # information retrieval based on semantics rather than traditional keyword-based search.
 # 
@@ -24,7 +24,17 @@ import numpy as np
 import sys
 import time
 import requests
-
+import os.path
+import PyPDF2
+import docx
+import json
+import xlrd
+import pptx
+import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
+import pytesseract
+from PIL import Image
+from openpyxl import load_workbook
 
 
 """
@@ -35,6 +45,170 @@ import requests
 #############################################################################################################
 """
 
+
+# Fonction pour générer un nom de fichier unique
+def generate_unique_filename(prefix, suffix):
+    """
+    Generates a unique filename by appending a random number between 1 and 9999 to the given prefix,
+    and then appending a specified suffix.
+    :param prefix: The prefix of the filename.
+    :param suffix: The suffix of the filename (usually the file extension).
+    :return: A string representing a unique filename with the format 'prefix_randomNumber.suffix'.
+    """ 
+    random_number = random.randint(1, 9999)
+    return f"{prefix}_{random_number}.{suffix}"
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier PDF en texte
+def convert_pdf_to_text(file_path):
+    """
+    Converts a PDF file to text using PyPDF2.
+    This function reads a PDF file, extracts the text from each page, and then concatenates the extracted text from all pages into a single string.
+    :param file_path: Path to the PDF file.
+    :return: The text extracted from the PDF file.
+    """
+    with open(file_path, "rb") as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text += page.extract_text()
+        return text
+
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier .docx en texte
+def convert_docx_to_text(file_path):
+    """
+    Converts the contents of a .docx file into plain text.
+    
+    This function takes as input a path to a .docx file, opens the file,
+    and extracts the text from each paragraph in the document. The extracted
+    text from each paragraph is then joined together with newline characters
+    in between each paragraph to form a single string of text.
+
+    :param file_path: The path to the .docx file.
+    :return: A single string containing the text of the .docx file.
+    """
+    doc = docx.Document(file_path)
+    text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+    return text
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier CSV en texte
+def convert_csv_to_text(file_path):
+    """
+    Converts a CSV file into a text format.
+    :param file_path: The path to the CSV file.
+    :return: A string representation of the CSV file.
+    """  
+    with open(file_path, "r") as file:
+        csv_reader = csv.reader(file)
+        text = "\n".join([",".join(row) for row in csv_reader])
+        return text
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier JSON en texte
+def convert_json_to_text(file_path):
+    """
+    Converts a JSON file into a formatted text string.
+    :param file_path: The path to the JSON file.
+    :return: A string representing the JSON data, formatted with indentation.
+    """
+    with open(file_path, "r") as file:
+        data = json.load(file)
+        text = json.dumps(data, indent=4)
+        return text
+
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier Excel en texte
+def convert_excel_to_text(file_path):
+    """
+    Converts an Excel workbook into a text format. Each cell is separated by a comma,
+    and each row is separated by a new line.
+
+    :param file_path: The path of the Excel file.
+    :return: A string representing the content of the Excel file.
+    """
+    workbook = load_workbook(file_path)
+    text = ""
+    for sheet in workbook:
+        for row in sheet.values:
+            text += ",".join([str(cell) for cell in row])
+            text += "\n"
+    return text
+
+
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier .pptx en texte
+def convert_pptx_to_text(file_path):
+    """
+    Converts the content of a PowerPoint presentation (.pptx) into text.
+    :param file_path: The path to the .pptx file.
+    :return: A string containing the text content of the presentation.
+    """ 
+    presentation = pptx.Presentation(file_path)
+    text = ""
+    for slide in presentation.slides:
+        for shape in slide.shapes:
+            if shape.has_text_frame:
+                for paragraph in shape.text_frame.paragraphs:
+                    text += paragraph.text
+                    text += "\n"
+    return text
+
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier XML en texte
+def convert_xml_to_text(file_path):
+    """
+    Convertit le contenu d'un fichier XML en texte brut.
+    :param file_path: Le chemin vers le fichier XML.
+    :return: Le texte extrait du fichier XML.
+    """
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    text = ET.tostring(root, encoding="utf-8", method="text").decode("utf-8")
+    return text
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir un fichier HTML en texte
+def convert_html_to_text(file_path):
+    """
+    Converts an HTML file into a plain text by removing all the HTML tags.
+    :param file_path: The path to the HTML file.
+    :return: The text content of the HTML file.
+    """
+    with open(file_path, "r") as file:
+        soup = BeautifulSoup(file, "html.parser")
+        text = soup.get_text()
+        return text
+
+# ----------------------------------------------------------------------------
+# Fonction pour convertir une image en texte à l'aide de l'OCR
+def convert_image_to_text(file_path):
+    """
+    Converts an image into text using Optical Character Recognition (OCR).
+    :param file_path: Path to the image file.
+    :return: Extracted text from the image.
+    """
+    image = Image.open(file_path)
+    text = pytesseract.image_to_string(image, lang="eng")
+    return text
+
+
+
+def convert_text_to_text(file_path):
+    """
+    Converts the content of a text file to UTF-8 and returns a text string.
+    :param file_path: The path to the text file.
+    :return: The text extracted from the text file.
+    """
+    with open(file_path, "r", encoding="utf-8") as file:
+        text = file.read()
+    return text
 
 
 
@@ -52,7 +226,6 @@ def concat_files_in_text(path):
         with open(file, 'r') as f:
             texts.append(f.read())
     return ' '.join(texts)
-# ----------------------------------------------------------------------------
 
 
 
@@ -95,7 +268,6 @@ def split_text_into_blocks(text, limit=4000):
 
     return blocks
 
-# ----------------------------------------------------------------------------
 
 
 
@@ -117,7 +289,6 @@ def write_blocks_to_csv(blocks, path, filename):
 
         for block in blocks:
             csvwriter.writerow([block])
-# ----------------------------------------------------------------------------
 
 
 
@@ -322,6 +493,57 @@ def validate_and_get_combined(res):
 
 
 
+
+
+# ----------------------------------------------------------------------------
+# Function that converts all the files in a folder to text and store them in a new subfolder named 'text'
+def create_text_folder(folder_path):
+    """
+    TODO: Write documentation
+    """
+    
+    # Folder containing the files to convert
+    source_folder = folder_path
+
+    # Destination folder for the converted text files
+    destination_folder = folder_path + "text_tmp"
+
+    # List of supported file formats
+    supported_formats = {
+        ".pdf": convert_pdf_to_text,
+        ".docx": convert_docx_to_text,
+        ".csv": convert_csv_to_text,
+        ".json": convert_json_to_text,
+        ".xls": convert_excel_to_text,
+        ".xlsx": convert_excel_to_text,
+        ".pptx": convert_pptx_to_text,
+        ".xml": convert_xml_to_text,
+        ".html": convert_html_to_text,
+        ".jpg": convert_image_to_text,
+        ".jpeg": convert_image_to_text,
+        ".png": convert_image_to_text,
+        ".txt": convert_text_to_text
+    }
+    
+    # Create the destination folder if it doesn't exist
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
+
+    # Iterate through all the files in the source folder
+    for file_name in os.listdir(source_folder):
+        source_file_path = os.path.join(source_folder, file_name)
+        if os.path.isfile(source_file_path):
+            file_name_without_ext, file_ext = os.path.splitext(file_name)
+            if file_ext.lower() in supported_formats:
+                converter = supported_formats[file_ext.lower()]
+                text = converter(source_file_path)
+                destination_file_name = generate_unique_filename(file_name_without_ext, "txt")
+                destination_file_path = os.path.join(destination_folder, destination_file_name)
+                with open(destination_file_path, "w", encoding="utf-8") as file:
+                    file.write(text)
+
+    return(str(destination_folder))
+
 """
 #############################################################################################################
     
@@ -358,22 +580,25 @@ def build_index(folder_path):
     :return: The name of the CSV file containing the embeddings.
     """
     
+    # transform files into text, create a subfolder named 'txt' and save the text files in it. 
+    text_folder_path = create_text_folder(folder_path)
+    
     # Concatenate files in text
-    text = concat_files_in_text(folder_path)
+    text = concat_files_in_text(text_folder_path)
 
-    # Save text in a txt file named txt_(random number).txt
-    random_num = random.randint(1000,9999)  # Generates a random number between 1000 and 9999
+    # OLD VERSION : Save text in a csv file named csv(random number).csv
+    # random_num = random.randint(1000,9999)  # Generates a random number between 1000 and 9999
 
     # Call the function split_text_into_blocks() to split the text into blocks
     blocks = split_text_into_blocks(text, limit=4000)
 
     # Call the function write_blocks_to_csv() to write the blocks into a csv file
-    write_blocks_to_csv(blocks, folder_path, f'csv_{random_num}.csv')
+    write_blocks_to_csv(blocks, folder_path, 'index.csv')
 
     # Create embeddings for the csv file
-    create_embeddings(folder_path, f'csv_{random_num}.csv')
+    create_embeddings(folder_path, 'index.csv')
     
-    return(f'emb_csv_{random_num}.csv')
+    return('index created in the file : emb_index.csv')
 
 
 # ----------------------------------------------------------------------------
@@ -455,8 +680,9 @@ def query_extended_llm(text, index_filename, model="gpt-4"):
                 'Authorization': f'Bearer {api_key}'
             }
             data = {
-                'model': 'gpt-4',
+                'model': model,
                 #'model': 'gpt-3.5-turbo',
+                'temperature': 0.01,
                 'messages': [
                     {'role': 'user', 'content': prompt},
                     {'role': 'system', 'content': system}
