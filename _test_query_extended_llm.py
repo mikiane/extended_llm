@@ -19,4 +19,5 @@ index_filename = 'datas/brightness.output/brightness.outputemb_csv_7794.csv'
 
 print(lib__embedded_context.query_extended_llm(text, index_filename, "gpt-4"))
 
+
 ###########################################################

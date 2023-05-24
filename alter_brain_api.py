@@ -31,6 +31,7 @@ import os
 import time
 from zipfile import ZipFile
 import shutil
+import sendmail
 
 # Base folder path
 base_folder = "datas/"
@@ -57,6 +58,8 @@ def handle_file():
         return jsonify({'error': 'No file provided'}), 400
 
     uploaded_file = request.files['file']
+    
+    email = request.form.get('email')
 
     # Vérifier si le nom du fichier est vide
     if uploaded_file.filename == '':
@@ -82,11 +85,15 @@ def handle_file():
     # Appeler la fonction d'indexation sur le nouveau dossier
     lib__embedded_context.build_index(folder_name)
 
-
+    brain_id = base_name + "_" + timestamp
     # Créer la réponse JSON
-    res = [{'id':1, 'request':'buildindex', 'answer': base_name + "_" + timestamp}]
+    res = [{'id':1, 'request':'buildindex', 'answer':brain_id}]
     response = jsonify(res)
     response.headers['Content-Type'] = 'application/json'
+    
+    #Send the Brain_id to the email
+    sendmail.mailfile(email, None, ' Votre index est prêt. Son brain_id est : ' + brain_id)
+
     
     # NOTE : the index is in the folder : base_folder + base_name + "_" + timestamp + "/" + emb_index.csv
 

@@ -385,7 +385,7 @@ def create_embeddings(path, filename):
     # write the value of the vector from the dataframe in a second CSV file named emb_xxx.csv
     df.to_csv(path + "emb_" + filename, index=False)
 
-
+    return(path)
 
 
 
@@ -597,9 +597,9 @@ def build_index(folder_path):
     write_blocks_to_csv(blocks, folder_path, 'index.csv')
 
     # Create embeddings for the csv file
-    create_embeddings(folder_path, 'index.csv')
+    brain_id = create_embeddings(folder_path, 'index.csv')
     
-    return('index created in the file : emb_index.csv')
+    return(brain_id)
 
 
 # ----------------------------------------------------------------------------
