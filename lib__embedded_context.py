@@ -625,9 +625,14 @@ def find_context(text, index_filename, n_results=3):
     :param n_results: The number of most similar data items to return. Default is 3.
     :return: The combined data from the most similar data items.
     """
+    
+    
+    
     load_dotenv(".env")  # Load the environment variables from the .env file.
     openai.api_key = os.environ.get("OPENAI_API_KEY")
-
+    if not os.path.exists(index_filename):
+        return ""
+    
     df = read_and_process_csv(index_filename)
 
     searchvector = get_search_vector(text)
