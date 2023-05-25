@@ -117,9 +117,15 @@ def handle_req():
     index = request.form.get('brain_id')
     index_filename = "datas/" + index + "/emb_index.csv"
     
+    # si le brain_id a la forme d'une url (http ou https), on crée un index specifique à l'url
+    
+    if index.startswith("http://") or index.startswith("https://"):
+        url = index
+        index_filename= "datas/" + lib__embedded_context.build_index_url(url) + "/emb_index.csv"
+        #index_filename = index_filename
+    
     context = lib__embedded_context.find_context(text, index_filename, n_results=3)
-
-    res = [{'id':1,'request':'summarize','answer':context}]
+    res = [{'id':1,'request':'searchcontext','answer':context}]
     response = jsonify(res)
     response.headers['Content-Type'] = 'application/json'
     return(response)

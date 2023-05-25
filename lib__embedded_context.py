@@ -35,7 +35,10 @@ from bs4 import BeautifulSoup
 import pytesseract
 from PIL import Image
 from openpyxl import load_workbook
-
+import requests
+from bs4 import BeautifulSoup
+from markdownify import markdownify as md
+from urllib.parse import urlparse, urljoin
 
 """
 #############################################################################################################
@@ -269,8 +272,6 @@ def split_text_into_blocks(text, limit=4000):
     return blocks
 
 
-
-
 # ----------------------------------------------------------------------------
 # Function that write blocks into filename
 def write_blocks_to_csv(blocks, path, filename):
@@ -289,8 +290,6 @@ def write_blocks_to_csv(blocks, path, filename):
 
         for block in blocks:
             csvwriter.writerow([block])
-
-
 
 
 # ----------------------------------------------------------------------------
@@ -545,6 +544,42 @@ def create_text_folder(folder_path):
 
     return(str(destination_folder))
 
+
+# ----------------------------------------------------------------------------
+# Function that converts an url to text
+def get_text_from_url(url):
+    """
+    Récupère le texte d'une page web à partir de son URL.
+    
+    Args:
+        url (str): L'URL de la page web à récupérer.
+        
+    Returns:
+        str: Le texte de la page web, ou une chaîne vide en cas d'erreur.
+    """
+    text = ""
+
+    try:
+        # Récupérer le contenu HTML de l'URL
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Erreur lors de la requête vers {url} : {e}")
+        return text
+
+    try:
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Extraire le texte de la structure HTML
+        text = soup.get_text()
+    except Exception as e:
+        print(f"Erreur lors de l'analyse HTML pour {url} : {e}")
+        return text
+
+    return text
+
+
+
 """
 #############################################################################################################
     
@@ -552,6 +587,8 @@ def create_text_folder(folder_path):
     
 #############################################################################################################
 """
+
+
 
 ## ----------------------------------------------------------------------------
 ## Function that creates a csv index file containing embeddings, from a folder named path. 
@@ -601,6 +638,27 @@ def build_index(folder_path):
     
     return(brain_id)
 
+
+## ----------------------------------------------------------------------------
+## Function that creates embdeedings from the content of an url
+def build_index_url(url):
+    
+    index_text = get_text_from_url(url)
+    
+    #créer un fichier temporaire    
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    folder_path = "datas/" + timestamp + "/"
+
+    # Créer le nouveau dossier
+    os.makedirs(folder_path, exist_ok=True)
+
+    # enregistrer le texte dans un fichier txt
+    with open(folder_path + 'url_index.txt', 'w', encoding='utf-8') as f:
+        f.write(index_text)
+            
+    build_index(folder_path)
+    
+    return(timestamp)
 
 # ----------------------------------------------------------------------------
 # Function that finds the context for a given query in an index file
