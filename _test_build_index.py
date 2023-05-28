@@ -17,7 +17,7 @@ import sendmail
 
 
 #folder_path = '<path to the folder containing the files to index>'
-folder_path = 'datas/brightness.source/'
+folder_path = 'datas/scenarioslogement/'
 # careful : only txt files.
 
 # build the index and save it in a csv file in the folder_path

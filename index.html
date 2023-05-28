@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #responseDiv {
+            background-color: transparent;
+            border: none;
+            width: 100%;
+            height: 300px;
+            overflow: auto;
+        }
+        #MultilineInput {
+            width: 100%;
+            height: 100px;
+        }
+    </style>
+    <script>
+        function getLastChars(str) {
+            if (str.length <= 30000) {
+              return str;
+            } else {
+              var lastHundred = str.substring(str.length - 30000);
+              var lastSpaceIndex = lastHundred.lastIndexOf(" ");
+              if (lastSpaceIndex !== -1) {
+                return "..." + lastHundred.substring(lastSpaceIndex + 1);
+              } else {
+                return "..." + lastHundred;
+              }
+            }
+        }
+
+        async function openaireq(script) {
+            const data = {
+              script:script,
+            };
+        
+            const response = await fetch("http://127.0.0.1:5000/streamtasks", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            const reader = response.body.getReader();
+            const textDecoder = new TextDecoder("utf-8");
+            var responseDiv = document.getElementById("responseDiv");
+            var MultilineInput = document.getElementById("MultilineInput");
+            var OKButton = document.getElementById("OKButton");
+
+            responseDiv.innerHTML+="\n\nVous : " + texte + "\n\n";    
+            var originalDisplayValue = OKButton.style.display;
+            OKButton.style.display = "none";
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                const chunk = textDecoder.decode(value);
+                responseDiv.innerHTML += chunk;
+                console.log(chunk);
+            }
+            MultilineInput.value = "";
+            OKButton.style.display = originalDisplayValue;
+        }
+
+        function removeQuotesAndLineBreaks(text) {
+            if (text === '') {
+              return '';
+            }
+            const regex = /["\n]/g;
+            return text.replace(regex, '');
+        }
+
+        window.onload = function() {
+            document.getElementById("OKButton").onclick = function() {
+                console.log("Avant de démarrer");
+                var MultilineInput = document.getElementById("MultilineInput");
+                var script = removeQuotesAndLineBreaks(MultilineInput.value);
+                console.log("script initialisé");
+  
+               openaireq(script);
+            };
+        };
+    </script>
+</head>
+<body>
+    <div id="responseDiv" contenteditable="true"></div>
+    <textarea id="MultilineInput"></textarea>
+    <button id="OKButton">OK</button>
+</body>
+</html>
