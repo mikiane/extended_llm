@@ -33,12 +33,8 @@ from zipfile import ZipFile
 import sendmail
 import lib__script_template_json
 import random
-from urllib.parse import unquote
-from dotenv import load_dotenv
-from queue import Queue
-from threading import Thread
-from flask_cors import cross_origin
-import json
+
+
 
 
 
@@ -141,84 +137,34 @@ def handle_req():
     response.headers['Content-Type'] = 'application/json'
     return(response)
     
-    
 
 
-def worker(task):
-    prompt = task.get('prompt', '')
-    brain_id = task.get('brain_id', '')
-    input_data = task.get('input_data', '')
-        
-    prompt = unquote(prompt)
-    context = unquote(brain_id)
-    input_data = unquote(input_data)
-    
-    if 'result' in task.get(input_data, {}):
-        input_data = task[input_data]['result']
-    
-    index_filename = "datas/" + brain_id + "/emb_index.csv"
-    prompt, context, input_data = lib__script_template_json.truncate_strings(prompt, '', input_data)
-    
-    context = lib__embedded_context.query_extended_llm(prompt + input_data, index_filename, model="gpt-4")
-    
-    prompt, context, input_data = lib__script_template_json.truncate_strings(prompt, context, input_data)
-    
-    load_dotenv(".env") 
-    model = "gpt-4" 
-    attempts = 0
-    execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
-
-    stream_generator = lib__script_template_json.request_llm_stream(prompt, context, input_data, model)
-
-    result = ''
-    for content in stream_generator:
-        result += content
-    task['result'] = result
-        
-    return task
-
-@app.route('/streamtasks', methods=['POST', 'OPTIONS'])
-@cross_origin()
+@app.route('/streamtasks', methods=['POST'])
 def handle_stream_tasks():
-    if request.method == 'OPTIONS':
-        # Prépare la réponse à la requête preflight
-        response = app.make_default_options_response()
+    # vérifier si la requête contient un json
+    if not request.is_json:
+        return jsonify({"error": "La requête doit contenir un JSON"}), 400
 
-        # Autorise l'origine, les méthodes et les en-têtes pour la requête principale
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = request.headers.get('Access-Control-Request-Method', '*')
-        response.headers['Access-Control-Allow-Headers'] = request.headers.get('Access-Control-Request-Headers', '*')
-        response.headers['Access-Control-Max-Age'] = 86400  # Permet aux navigateurs de mettre en cache la réponse pendant 24 heures
-
-        return response
-
+    # vérifier si le json contient un champ 'script'
     script = request.get_json().get('script')
+    if script is None:
+        return jsonify({"error": "Le JSON doit contenir un champ 'script'"}), 400
+
+    try:
+        json_file = "tmp/test" + str(random.randint(0, 1000)) + ".json"
     
-    json_file = "tmp/test" + str(random.randint(0, 1000)) + ".json"
-    
-    lib__script_template_json.text_to_json(script, json_file)
+        lib__script_template_json.text_to_json(script, json_file)
 
-    tasks = lib__script_template_json.read_json_file(json_file)
+        tasks = lib__script_template_json.read_json_file(json_file)
+    except Exception as e:
+        # une erreur s'est produite lors de la conversion du texte en json ou de la lecture du fichier json
+        return jsonify({"error": str(e)}), 500
 
-    def generate():
-        # Create the queue and populate with tasks
-        q = Queue()
-        for task_name in tasks:
-            q.put(task_name)
-
-        while not q.empty():
-            task_name = q.get()
-            task = tasks[task_name]
-
-            # Process the task here and get the result
-            result = worker(task)
-
-            # Yield the result in a streaming-friendly format
-            yield json.dumps({'status': 'success', 'result': result}) + '\n'
-
-            q.task_done()
-
-    return Response(generate(), mimetype='application/json')
+    try:
+        return Response(lib__script_template_json.execute_tasks(tasks), mimetype='text/event-stream')
+    except Exception as e:
+        # une erreur s'est produite lors de l'exécution des tâches
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

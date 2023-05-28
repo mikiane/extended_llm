@@ -39,6 +39,10 @@ import requests
 import time
 import sys
 import openai
+from urllib.parse import unquote
+from dotenv import load_dotenv
+from queue import Queue
+import json
 
 
 
@@ -193,6 +197,132 @@ def request_llm(prompt, context, input_data, model):
     print("Erreur : Echec de la création de la completion après 5 essais")
     sys.exit()
     
+"""
+
+def execute_tasks(tasks):
+        q = Queue()
+        for task_name in tasks:
+            q.put(task_name)
+        
+        
+        while not q.empty():
+            task_name = q.get()
+            task = tasks[task_name]
+            
+            prompt = unquote(task.get('prompt', ''))
+            brain_id = unquote(task.get('brain_id', ''))
+            input_data = unquote(task.get('input_data', ''))
+            
+            model = "gpt-4"
+            
+            if 'result' in task.get(input_data, {}):
+                input_data = task[input_data]['result']
+            
+            index_filename = "datas/" + brain_id + "/emb_index.csv"
+            prompt, context, input_data = truncate_strings(prompt, '', input_data)
+            
+            
+            # find context
+            context = lib__embedded_context.find_context(prompt, index_filename, 3)
+            
+            # truncate strings
+            prompt, context, input_data = truncate_strings(prompt, context, input_data)
+
+            # prepre input data
+            load_dotenv(".env") # Load the environment variables from the .env file.
+            execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
+            system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
+            
+            # call openAI to get the streaming response 
+            try:
+                response = openai.ChatCompletion.create(
+                    model=model,
+                    messages=[
+                        {'role': 'system', 'content': system},
+                        {'role': 'user', 'content': execprompt}
+                    ],
+                    temperature=0.01,
+                    stream=True
+                )
+
+                    
+                for chunk in response:
+                    if 'delta' in chunk['choices'][0] and 'content' in chunk['choices'][0]['delta']:
+                        content = chunk['choices'][0]['delta']['content']
+                        print(content)
+                        yield content
+
+            except openai.error.OpenAIError as e:  # attraper les erreurs spécifiques à OpenAI
+                print(f"Erreur OpenAI: {e}")
+"""
+
+
+def execute_tasks(tasks):
+    q = Queue()
+    for task_name in tasks:
+        q.put(task_name)
+
+    while not q.empty():
+        task_name = q.get()
+        task = tasks[task_name]
+
+        # input_data might be a task name, in which case we should use the result of that task
+        input_data = unquote(task.get('input_data', ''))
+        if input_data.startswith("task") and input_data in tasks and 'result' in tasks[input_data]:
+            input_data = tasks[input_data]['result']
+
+        prompt = unquote(task.get('prompt', ''))
+        brain_id = unquote(task.get('brain_id', ''))
+        
+        model = "gpt-4"
+
+        index_filename = "datas/" + brain_id + "/emb_index.csv"
+        prompt, context, input_data = truncate_strings(prompt, '', input_data)
+        
+        # find context
+        context = lib__embedded_context.find_context(prompt, index_filename, 3)
+        
+        # truncate strings
+        prompt, context, input_data = truncate_strings(prompt, context, input_data)
+
+        # prepare input data
+        load_dotenv(".env") # Load the environment variables from the .env file.
+        execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
+        system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
+        attempts = 0
+        
+        # call openAI to get the streaming response 
+        result = ''
+        try:
+            response = openai.ChatCompletion.create(
+                model=model,
+                messages=[
+                    {'role': 'system', 'content': system},
+                    {'role': 'user', 'content': execprompt}
+                ],
+                temperature=0.01,
+                stream=True
+            )
+
+            for chunk in response:
+                if 'delta' in chunk['choices'][0] and 'content' in chunk['choices'][0]['delta']:
+                    content = chunk['choices'][0]['delta']['content']
+                    print(content)
+                    result += content
+
+        except openai.error.OpenAIError as e:  # catch errors specific to OpenAI
+            print(f"OpenAI error: {e}")
+
+        # Store the result in the task itself:
+        task['result'] = result  
+
+        # Update the input_data of tasks that depend on the completed task:
+        for dependent_task_name, dependent_task in tasks.items():
+            if 'input_data' in dependent_task and dependent_task['input_data'] == task_name:
+                dependent_task['input_data'] = result
+
+
+
     
     
 def request_llm_stream(prompt, context, input_data, model) :
