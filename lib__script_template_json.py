@@ -308,6 +308,7 @@ def execute_tasks(tasks):
                 if 'delta' in chunk['choices'][0] and 'content' in chunk['choices'][0]['delta']:
                     content = chunk['choices'][0]['delta']['content']
                     print(content)
+                    yield f"{content}"
                     result += content
 
         except openai.error.OpenAIError as e:  # catch errors specific to OpenAI
@@ -320,8 +321,6 @@ def execute_tasks(tasks):
         for dependent_task_name, dependent_task in tasks.items():
             if 'input_data' in dependent_task and dependent_task['input_data'] == task_name:
                 dependent_task['input_data'] = result
-
-
 
     
     
