@@ -409,7 +409,7 @@ def exec_task(prompt, brain_id, input_data):
 def execute_json(input_json_file, output_json_file):
     # Lecture du fichier json
     tasks = read_json_file(input_json_file)
-
+    
     for task in tasks:
         prompt = tasks[task].get('prompt', '')
         brain_id = tasks[task].get('brain_id', '')

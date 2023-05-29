@@ -157,8 +157,10 @@ def handle_stream_tasks():
         json_file = "tmp/test" + str(random.randint(0, 1000)) + ".json"
         print("script d'entrée :" + script)
         lib__script_template_json.text_to_json(script, json_file)
+        
+        tasks = lib__script_template_json.read_json_file(json_file)    
+        print("Taches à executer " + str(tasks))
 
-        tasks = lib__script_template_json.read_json_file(json_file)
     except Exception as e:
         # une erreur s'est produite lors de la conversion du texte en json ou de la lecture du fichier json
         return jsonify({"error": str(e)}), 500
