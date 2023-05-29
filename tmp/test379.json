@@ -1,0 +1,6 @@
+{
+    "task1": {
+        "prompt": "Faire un r\u00e9sumer des news de la page d'accueil du site Lemonde",
+        "brain_id": "https://www.lemonde.fr"
+    }
+}

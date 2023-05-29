@@ -276,8 +276,13 @@ def execute_tasks(tasks):
         brain_id = unquote(task.get('brain_id', ''))
         
         model = "gpt-4"
-
+        
         index_filename = "datas/" + brain_id + "/emb_index.csv"
+        
+        if brain_id.startswith("http://") or brain_id.startswith("https://"):
+            url = brain_id
+            index_filename= "datas/" + lib__embedded_context.build_index_url(url) + "/emb_index.csv"
+
         prompt, context, input_data = truncate_strings(prompt, '', input_data)
         
         # find context
@@ -311,7 +316,12 @@ def execute_tasks(tasks):
                     print(content)
                     yield f"{content}"
                     result += content
-
+            
+            #Saut de ligne entre tache
+            print("\n\n")
+            yield "\n\n"
+            result += "\n\n"
+            
         except openai.error.OpenAIError as e:  # catch errors specific to OpenAI
             print(f"OpenAI error: {e}")
 
