@@ -1,0 +1,2 @@
+gunicorn --bind 0.0.0.0:8002 -w 4 alter_brain_api:app --timeout 1200 --daemon --access-logfile /home/michel/docs/access.log --error-logfile /home/michel/docs/error.log --capture-output
+
