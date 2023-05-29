@@ -143,16 +143,19 @@ def handle_req():
 def handle_stream_tasks():
     # vérifier si la requête contient un json
     if not request.is_json:
+        print("La requête doit contenir un JSON")
         return jsonify({"error": "La requête doit contenir un JSON"}), 400
 
+    print("Requête reçue : " + str(request.get_json()))
     # vérifier si le json contient un champ 'script'
     script = request.get_json().get('script')
     if script is None:
+        print("Le JSON doit contenir un champ 'script'")
         return jsonify({"error": "Le JSON doit contenir un champ 'script'"}), 400
 
     try:
         json_file = "tmp/test" + str(random.randint(0, 1000)) + ".json"
-    
+        print("script d'entrée :" + script)
         lib__script_template_json.text_to_json(script, json_file)
 
         tasks = lib__script_template_json.read_json_file(json_file)
