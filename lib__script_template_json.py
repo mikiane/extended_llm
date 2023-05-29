@@ -55,7 +55,7 @@ import json
 def read_json_file(file):
     with open(file, 'r') as f:
         data = json.load(f)
-        print(data)
+        #print(data)
     return data
 
 # Fonction pour écrire dans un fichier json
