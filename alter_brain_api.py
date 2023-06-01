@@ -65,7 +65,6 @@ def handle_file():
         return jsonify({'error': 'No file provided'}), 400
 
     uploaded_file = request.files['file']
-    
     email = request.form.get('email')
 
     # Vérifier si le nom du fichier est vide
@@ -147,6 +146,9 @@ def handle_stream_tasks():
         return jsonify({"error": "La requête doit contenir un JSON"}), 400
 
     print("Requête reçue : " + str(request.get_json()))
+    
+    model = request.get_json().get('model', 'gpt-4')
+
     # vérifier si le json contient un champ 'script'
     script = request.get_json().get('script')
     if script is None:
@@ -166,7 +168,7 @@ def handle_stream_tasks():
         return jsonify({"error": str(e)}), 500
 
     try:
-        return Response(lib__script_template_json.execute_tasks(tasks), mimetype='text/event-stream')
+        return Response(lib__script_template_json.execute_tasks(tasks, model), mimetype='text/event-stream')
     except Exception as e:
         # une erreur s'est produite lors de l'exécution des tâches
         return jsonify({"error": str(e)}), 500

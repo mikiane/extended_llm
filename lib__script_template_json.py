@@ -198,67 +198,9 @@ def request_llm(prompt, context, input_data, model):
     print("Erreur : Echec de la création de la completion après 5 essais")
     sys.exit()
     
-"""
-
-def execute_tasks(tasks):
-        q = Queue()
-        for task_name in tasks:
-            q.put(task_name)
-        
-        
-        while not q.empty():
-            task_name = q.get()
-            task = tasks[task_name]
-            
-            prompt = unquote(task.get('prompt', ''))
-            brain_id = unquote(task.get('brain_id', ''))
-            input_data = unquote(task.get('input_data', ''))
-            
-            model = "gpt-4"
-            
-            if 'result' in task.get(input_data, {}):
-                input_data = task[input_data]['result']
-            
-            index_filename = "datas/" + brain_id + "/emb_index.csv"
-            prompt, context, input_data = truncate_strings(prompt, '', input_data)
-            
-            
-            # find context
-            context = lib__embedded_context.find_context(prompt, index_filename, 3)
-            
-            # truncate strings
-            prompt, context, input_data = truncate_strings(prompt, context, input_data)
-
-            # prepre input data
-            load_dotenv(".env") # Load the environment variables from the .env file.
-            execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
-            system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
-            
-            # call openAI to get the streaming response 
-            try:
-                response = openai.ChatCompletion.create(
-                    model=model,
-                    messages=[
-                        {'role': 'system', 'content': system},
-                        {'role': 'user', 'content': execprompt}
-                    ],
-                    temperature=0.01,
-                    stream=True
-                )
-
-                    
-                for chunk in response:
-                    if 'delta' in chunk['choices'][0] and 'content' in chunk['choices'][0]['delta']:
-                        content = chunk['choices'][0]['delta']['content']
-                        print(content)
-                        yield content
-
-            except openai.error.OpenAIError as e:  # attraper les erreurs spécifiques à OpenAI
-                print(f"Erreur OpenAI: {e}")
-"""
 
 
-def execute_tasks(tasks):
+def execute_tasks(tasks, model):
     q = Queue()
     for task_name in tasks:
         q.put(task_name)
@@ -275,7 +217,7 @@ def execute_tasks(tasks):
         prompt = unquote(task.get('prompt', ''))
         brain_id = unquote(task.get('brain_id', ''))
         
-        model = "gpt-4"
+        model = model
         
         index_filename = "datas/" + brain_id + "/emb_index.csv"
         
@@ -288,8 +230,13 @@ def execute_tasks(tasks):
         # find context
         context = lib__embedded_context.find_context(prompt, index_filename, 3)
         
-        # truncate strings
-        prompt, context, input_data = truncate_strings(prompt, context, input_data)
+        
+        if model=="gpt-4":
+            # truncate strings for gpt-4
+            prompt, context, input_data = truncate_strings(prompt, context, input_data)
+        else:
+            # truncate strings for gpt-3.5-turbo
+            prompt, context, input_data = truncate_strings(prompt, context, input_data, 4500)
 
         # prepare input data
         load_dotenv(".env") # Load the environment variables from the .env file.
@@ -367,9 +314,8 @@ def request_llm_stream(prompt, context, input_data, model) :
 
 
 # tronuqer les chaînes pour éviter les erreurs de longueur
-def truncate_strings(prompt, context, input_data):
+def truncate_strings(prompt, context, input_data, max_length=9000):
     # Définir la longueur maximale autorisée avec GPT4
-    max_length = 9000
 
     # Calculer la longueur actuelle de toutes les chaînes combinées
     total_length = len(prompt) + len(context) + len(input_data)
@@ -396,27 +342,35 @@ def truncate_strings(prompt, context, input_data):
 
 
 # Fonction pour l'execution de taches
-def exec_task(prompt, brain_id, input_data):
+def exec_task(prompt, brain_id, input_data, model="gpt-4"):
     
     index_filename = "datas/" + brain_id + "/emb_index.csv"
     
-    # Limitation des erreurs de longueur
-    prompt, context, input_data = truncate_strings(prompt, '', input_data)
-    
+    if model == "gpt-4":
+        # Limitation des erreurs de longueur
+        prompt, context, input_data = truncate_strings(prompt, '', input_data)
+    else:
+        # Limitation des erreurs de longueur
+        prompt, context, input_data = truncate_strings(prompt, '', input_data, 4500)
+        
     # recherche du contexte
-    context = lib__embedded_context.query_extended_llm(prompt + input_data, index_filename, model="gpt-4")
+    context = lib__embedded_context.query_extended_llm(prompt + input_data, index_filename, model)
     
-    # Limitation des erreurs de longueur
-    prompt, context, input_data = truncate_strings(prompt, context, input_data)
-    
+    if model == "gpt-4":
+        # Limitation des erreurs de longueur
+        prompt, context, input_data = truncate_strings(prompt, context, input_data)
+    else:
+        # Limitation des erreurs de longueur
+        prompt, context, input_data = truncate_strings(prompt, context, input_data, 4500)
+
     # Appel au LLM
-    res = request_llm(prompt, context, input_data, 'gpt-4')
+    res = request_llm(prompt, context, input_data, model)
 
     return (res)
 
 
 
-def execute_json(input_json_file, output_json_file):
+def execute_json(input_json_file, output_json_file, model="gpt-4"):
     # Lecture du fichier json
     tasks = read_json_file(input_json_file)
     
@@ -431,7 +385,7 @@ def execute_json(input_json_file, output_json_file):
             input_data = tasks[input_data]['result']
         
         # Appeler la fonction execute la tache avec le contexte et obtenir le résultat
-        result = exec_task(prompt, brain_id, input_data)
+        result = exec_task(prompt, brain_id, input_data, model)
 
         # Ajouter le résultat à la tâche actuelle
         tasks[task]['result'] = result

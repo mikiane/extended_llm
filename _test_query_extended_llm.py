@@ -13,11 +13,11 @@ text = "\
     Etapes : Trouver les 3 principaux concurrents de facon global puis les 3 concurrents sur chacune des offres de Brightness. Sur la base de ces éléments, trouver des éléments différentiateurs. Rédiger une nouvelle manière de présenter Brightness et ses offres (par exemple sous la forme d’un mail type ou d’une présentation sur la home page du site de Brightness). \
     Format : Un texte d’une longueur de plus de 5000 signes.\
     "
-
+model = "gpt-4"
 #index_filename = '<filename of the indexfile generated with build index>'
 index_filename = 'datas/brightness.output/brightness.outputemb_csv_7794.csv'
 
-print(lib__embedded_context.query_extended_llm(text, index_filename, "gpt-4"))
+print(lib__embedded_context.query_extended_llm(text, index_filename, model))
 
 
 ###########################################################

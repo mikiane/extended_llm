@@ -1,6 +1,8 @@
 import lib__script_template_json
 import random
 
+
+
 """
 DATA DE TEST :
 
@@ -15,6 +17,8 @@ Context:
 Input Data: task1
     
 """
+
+model = "gpt-3.5-turbo"
 
 script="Task: task1\n\
     Prompt: identifier les tendances les plus impactantes pour l'avenir du secteur de la mobilité\n\
@@ -31,5 +35,5 @@ output_json_file = "tmp/test_output" + random.randint(0, 1000).__str__() + ".jso
 # write text to json file
 lib__script_template_json.text_to_json(script, json_file)
 
-lib__script_template_json.execute_json(json_file, output_json_file)
+lib__script_template_json.execute_json(json_file, output_json_file, model="gpt-4")
 
