@@ -762,7 +762,7 @@ def query_extended_llm(text, index_filename, model="gpt-4"):
             error_reason = str(e)
             attempts += 1
             print(f"Erreur : {error_code} - {error_reason}. Nouvel essai dans 5 secondes...")
-            time.sleep(5)
+            time.sleep(0.05)
 
     print("Erreur : Echec de la création de la completion après 5 essais")
     sys.exit()

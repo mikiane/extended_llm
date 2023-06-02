@@ -193,7 +193,7 @@ def request_llm(prompt, context, input_data, model):
             error_reason = str(e)
             attempts += 1
             print(f"Erreur : {error_code} - {error_reason}. Nouvel essai dans 5 secondes...")
-            time.sleep(5)
+            time.sleep(0.05)
 
     print("Erreur : Echec de la création de la completion après 5 essais")
     sys.exit()
@@ -308,7 +308,7 @@ def request_llm_stream(prompt, context, input_data, model) :
         except openai.error.OpenAIError as e:  # attraper les erreurs spécifiques à OpenAI
             attempts += 1
             print(f"Erreur OpenAI: {e}. Nouvel essai dans 5 secondes...")
-            time.sleep(5)
+            time.sleep(0.05)
    
     
 
