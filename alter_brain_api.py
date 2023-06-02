@@ -59,9 +59,10 @@ def handle_file():
     If it's not a zip file, it saves the file to the created directory.
     Finally, it calls the index_folder function with the created directory name.
     """
-
+    print("dans buildindex")
     # Vérifier si un fichier a été fourni
     if 'file' not in request.files:
+        print("pas de fichier fourni")
         return jsonify({'error': 'No file provided'}), 400
 
     uploaded_file = request.files['file']
@@ -69,6 +70,7 @@ def handle_file():
 
     # Vérifier si le nom du fichier est vide
     if uploaded_file.filename == '':
+        print("nom de fichier vide")
         return jsonify({'error': 'No file provided'}), 400
 
     # Récupérer le nom de base du fichier et créer un nouveau nom de dossier avec un timestamp
@@ -83,11 +85,14 @@ def handle_file():
     # Si le fichier est un zip, le dézipper
     if uploaded_file.filename.endswith('.zip'):
         with ZipFile(uploaded_file, 'r') as zip_ref:
+            print("extraction zip")
             zip_ref.extractall(folder_name)
     else:
         # Si le fichier n'est pas un zip, le sauvegarder dans le nouveau dossier
         file_path = os.path.join(folder_name, uploaded_file.filename)
         uploaded_file.save(file_path)
+        print("recuperation fichier unique")
+
         
     print("folder_name for build_index : " + folder_name)
     # Appeler la fonction d'indexation sur le nouveau dossier
@@ -99,6 +104,7 @@ def handle_file():
     response = jsonify(res)
     response.headers['Content-Type'] = 'application/json'
     
+    print("brain_id : " + brain_id)
     #Send the Brain_id to the email
     sendmail.mailfile(email, None, ' Votre index est prêt. Son brain_id est : ' + brain_id)
 
