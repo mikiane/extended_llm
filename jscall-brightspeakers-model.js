@@ -95,16 +95,17 @@ function getLastChars(str) {
 
   //var system = removeQuotesAndLineBreaks(SystemInput.value);
   var system = "Une IA capable de rédiger du texte en prenant en compte un contexte issu de la base Brightness et en s'appuyant sur celle-ci pour répondre à des instructions.";
-  console.log("system initialisé");
+  console.log("system initialisé" + system);
   
   var contexte =  removeQuotesAndLineBreaks(responseDiv.innerHTML);
-  console.log("contexte initialisé");
+  console.log("contexte initialisé" + contexte);
   
   texte = removeQuotesAndLineBreaks(MultilineInput.value);
-  console.log("texte adapté");
+  console.log("texte adapté" + texte);
   
   var contexte = getLastChars(contexte);
   model = removeQuotesAndLineBreaks(document.getElementById("model").textContent);
+  console.log("modele récupéré" + model);
 
   openaireq(consigne, contexte, texte, system, model);
   
