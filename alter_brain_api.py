@@ -77,6 +77,7 @@ def handle_file():
     folder_name = f"{base_folder}{base_name}_{timestamp}/"
 
     # Créer le nouveau dossier
+    print("creation du folder_name s'il n'existe pas : " + folder_name)
     os.makedirs(folder_name, exist_ok=True)
 
     # Si le fichier est un zip, le dézipper
@@ -87,7 +88,8 @@ def handle_file():
         # Si le fichier n'est pas un zip, le sauvegarder dans le nouveau dossier
         file_path = os.path.join(folder_name, uploaded_file.filename)
         uploaded_file.save(file_path)
-    
+        
+    print("folder_name for build_index : " + folder_name)
     # Appeler la fonction d'indexation sur le nouveau dossier
     lib__embedded_context.build_index(folder_name)
 
