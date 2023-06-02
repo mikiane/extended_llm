@@ -148,6 +148,7 @@ def handle_stream_tasks():
     print("Requête reçue : " + str(request.get_json()))
     
     model = request.get_json().get('model', 'gpt-4')
+    print("Modèle utilisé : " + model)
 
     # vérifier si le json contient un champ 'script'
     script = request.get_json().get('script')
