@@ -24,13 +24,13 @@ n_feeds = 10 # define the number of feeds to get from Feedly
 n_links = 2 # define the number of links to get from each feed
 
 ## INITIALISATION
-st.write("\033c", end="")
+# st.write("\033c", end="")
 st.write("Bienvenue dans le generateur de podcasts Brightness AI !\n\n")
 st.write("Ce script va vous permettre de générer un podcast à partir de sources de veille.\n\n")
 st.write("Il va d'abord vous demander de saisir un sujet de veille, puis il va récupérer les sources de veille sur Feedly, les parsant, les résument et les envoyant par mail sous la forme d'une chronique.\n\n")
 st.write("Pour commencer, veuillez saisir un sujet de veille.\n\n")
 # confirmation
-topic = input("Quel sujet souhaitez-vous traiter ? ")
+topic = st.text_input("Quel sujet souhaitez-vous traiter ? ")
 
 if topic.lower() == '':
     st.write("Le script s'est arrêté.")
@@ -77,11 +77,11 @@ st.write("\n\n")
 
 ##########################################################################################################################################################################
 # confirmation
-confirmation = input("Voulez-vous continuer avec ces sources ? (y/n) ")
+confirmation = st.text_input("Voulez-vous continuer avec ces sources ? (y/n) ")
 
 if confirmation.lower() != 'y':
-    feed = input("saisir un flux RSS à traiter : ")
-    n_links = input("saisir le nombre de liens à traiter (max 5): ")
+    feed = st.text_input("saisir un flux RSS à traiter : ")
+    n_links = st.text_input("saisir le nombre de liens à traiter (max 5): ")
     rss_urls = [["Feed", feed]]
 else:
     st.write("Le script continue avec les flux spécifiés...")
