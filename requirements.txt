@@ -226,7 +226,7 @@ premailer==3.10.0
 preshed==3.0.8
 proglog==0.1.10
 prometheus-client==0.16.0
-gobject-introspection==1.44.0
+gobject-introspection==1.76.1
 prompt-toolkit==3.0.38
 protobuf==3.20.3
 psutil==5.9.4
