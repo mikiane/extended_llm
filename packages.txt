@@ -1,2 +1,2 @@
 pkg-config
-cairo
+libcairo2-dev
