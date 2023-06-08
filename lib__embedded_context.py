@@ -559,9 +559,13 @@ def get_text_from_url(url):
     """
     text = ""
 
+    headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
+
     try:
         # Récupérer le contenu HTML de l'URL
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Erreur lors de la requête vers {url} : {e}")
@@ -762,7 +766,7 @@ def query_extended_llm(text, index_filename, model="gpt-4"):
             error_reason = str(e)
             attempts += 1
             print(f"Erreur : {error_code} - {error_reason}. Nouvel essai dans 5 secondes...")
-            time.sleep(0.05)
+            time.sleep(int(attempts)*2)
 
     print("Erreur : Echec de la création de la completion après 5 essais")
     sys.exit()

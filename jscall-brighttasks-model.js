@@ -26,6 +26,11 @@ function removeQuotesAndLineBreaks(text) {
   }
   
   async function openaireq(script, model) {
+      
+    // Masquer le bouton et sauvegarder la valeur initiale de 'display'
+    var originalDisplayValue = document.getElementById("OKButton").style.display;
+    document.getElementById("OKButton").style.display = "none";
+    
       const data = {
         script: script,
         model: model
@@ -45,9 +50,7 @@ function removeQuotesAndLineBreaks(text) {
     
   
     responseDiv.innerHTML+="\n\nVous : " + script + "\n\n";    
-    // Masquer le bouton et sauvegarder la valeur initiale de 'display'
-    var originalDisplayValue = document.getElementById("OKButton").style.display;
-    document.getElementById("OKButton").style.display = "none";
+    
   
   
       while (true) {
@@ -57,14 +60,15 @@ function removeQuotesAndLineBreaks(text) {
           responseDiv.innerHTML += chunk;
           console.log(chunk);
       }
-  
-    MultilineInput.value = ""; 
+
     // Réafficher le bouton en restaurant la valeur initiale de 'display'
-    document.getElementById("OKButton").style.display = originalDisplayValue;
+    document.getElementById("OKButton").style.display = originalDisplayValue;  
   
+
   }
   
-  
+
+
   console.log("Avant de démarrer");
 
   // initialisation des variables
@@ -77,7 +81,9 @@ function removeQuotesAndLineBreaks(text) {
   console.log(script + "\n\n" + model);
   openaireq(script, model);
   
-  
+  MultilineInput.value = ""; 
+
+
   
   
   

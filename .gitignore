@@ -3,5 +3,7 @@ files/
 __pycache__/
 datas/*
 datas/**/
-jscall.js
 .DS_Store
+img/*
+models/
+_test*

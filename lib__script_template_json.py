@@ -159,11 +159,11 @@ def text_to_json(text, json_file):
 ####################################################################################################
 
 
-def request_llm(prompt, context, input_data, model):
+def request_llm(prompt, context, input_data, model="gpt-4"):
     load_dotenv(".env") # Load the environment variables from the .env file.
     attempts = 0
     execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
-    
+    print("EXECUTION DU PROMPT : " + execprompt)
     api_key = os.environ.get("OPENAI_API_KEY")
     system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
 
@@ -192,10 +192,10 @@ def request_llm(prompt, context, input_data, model):
             error_code = type(e).__name__
             error_reason = str(e)
             attempts += 1
-            print(f"Erreur : {error_code} - {error_reason}. Nouvel essai dans 5 secondes...")
-            time.sleep(0.05)
+            print(f"Erreur : {error_code} - {error_reason}. Nouvel essai dans {str(attempts * 2)} secondes...")
+            time.sleep(attempts * 2)
 
-    print("Erreur : Echec de la création de la completion après 5 essais")
+    print("Erreur : Echec de la création de la completion après 10 essais")
     sys.exit()
     
 
@@ -308,7 +308,7 @@ def request_llm_stream(prompt, context, input_data, model) :
         except openai.error.OpenAIError as e:  # attraper les erreurs spécifiques à OpenAI
             attempts += 1
             print(f"Erreur OpenAI: {e}. Nouvel essai dans 5 secondes...")
-            time.sleep(0.05)
+            time.sleep(attempts * 2)
    
     
 
