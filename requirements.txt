@@ -309,7 +309,7 @@ sgmllib3k==1.0.0
 shellingham==1.5.0.post1
 silverware==2020.11.12
 six==1.16.0
-sklearn==0.0.post5
+scikit-learn
 slytherin==2020.11.12
 smart-open==6.3.0
 smartypants==2.0.1
