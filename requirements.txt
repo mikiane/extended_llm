@@ -246,7 +246,6 @@ pydeck==0.8.1b0
 pydub==0.25.1
 pyflakes==3.0.1
 Pygments==2.15.1
-PyGObject==3.44.1
 pylatexenc==2.10
 pymdown-extensions==10.0
 Pympler==1.0.1
