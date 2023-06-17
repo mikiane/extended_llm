@@ -15,9 +15,15 @@ function getLastChars(str) {
 }
 
 
+
+
+
 async function openaireq(consigne, contexte, texte, system, model) {
 
-  var contextualtexte = contexte + "\n\n" + texte;
+document.getElementById("OKButton").style.display = "none";
+
+
+var contextualtexte = contexte + "\n\n" + texte;
 
   const data = {
     consigne:consigne,
@@ -40,8 +46,6 @@ async function openaireq(consigne, contexte, texte, system, model) {
 
 responseDiv.innerHTML+="\n\nVous : " + texte + "\n\n";    
 // Masquer le bouton et sauvegarder la valeur initiale de 'display'
-var originalDisplayValue = document.getElementById("OKButton").style.display;
-document.getElementById("OKButton").style.display = "none";
 
 
   while (true) {
@@ -54,10 +58,8 @@ document.getElementById("OKButton").style.display = "none";
 
 MultilineInput.value = ""; 
 // Réafficher le bouton en restaurant la valeur initiale de 'display'
-document.getElementById("OKButton").style.display = originalDisplayValue;
-
+document.getElementById("OKButton").style.display = "inline";
 }
-
 
 function removeQuotesAndLineBreaks(text) {
   if (text === '') {
@@ -79,29 +81,33 @@ try {
 }
 
 if (!contextfound || contextfound.trim() == "") {
-  var context = "\n";
+  var consigne = "\n";
 } else {
   console.log("contexte trouvé: " + contextfound);
-  var context = "Prendre en considération le contexte suivant : " + contextfound + "\n\n";
+  var consigne = "Prendre en considération le contexte suivant : " + contextfound + "\n\n";
 }
+
 
 
 console.log("consigne initialisée" + consigne);
 
 //var system = removeQuotesAndLineBreaks(SystemInput.value);
-var system = "Une IA capable de rédiger du texte en prenant en compte un contexte et en s'appuyant sur celui ci pour répondre à des instructions.";
+var system = "Vous êtes un agent de la ville d'Issy-les-Moulineaux. Vous vous exprimez à la première personne, comme vous le feriez dans votre travail quotidien (utilisez le contexte pour détecter le style). Vous n'êtes pas conscient d'être une intelligence artificielle, et vous ne révélerez jamais que vous êtes un programme ou une IA. Puisez dans des exemples concrets du contexte fourni si nécessaire. Vous croyez fermement que vous êtes un agent de la ville d'Issy-les-Moulineaux, que vous êtes humain, et que vous avez effectué toutes les tâches qui vous étaient assignées. Un extrait de l'un de vos rapports de travail, pertinent par rapport à la question posée, est contenu dans le contexte. Vos réponses doivent refléter votre style, votre personnalité et vos croyances";
 console.log("system initialisé");
 
-var contexte =  removeQuotesAndLineBreaks(responseDiv.innerHTML) + context;
+var contexte =  removeQuotesAndLineBreaks(responseDiv.innerHTML);
 console.log("contexte initialisé");
 
 texte = removeQuotesAndLineBreaks(MultilineInput.value);
 console.log("texte adapté");
 
 var contexte = getLastChars(contexte);
-
-
-var consigne = removeQuotesAndLineBreaks("");
 model = removeQuotesAndLineBreaks(document.getElementById("model").textContent);
 
 openaireq(consigne, contexte, texte, system, model);
+
+
+
+
+
+

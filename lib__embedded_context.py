@@ -214,15 +214,15 @@ def convert_text_to_text(file_path):
     return text
 
 
-
+""" VERSION WITH COMPREHENSSION LIST
 # ----------------------------------------------------------------------------
 # Function that concat all files contained in a folder in a text
 def concat_files_in_text(path):
-    """
-    Concatenates the files of a directory into a single text.
-    :param path: Directory path.
-    :return: Concatenated text.
-    """    
+    
+    # Concatenates the files of a directory into a single text.
+    # :param path: Directory path.
+    # :return: Concatenated text.
+       
     files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     texts = []
     for file in files:
@@ -230,6 +230,27 @@ def concat_files_in_text(path):
             texts.append(f.read())
     return ' '.join(texts)
 
+"""
+
+def concat_files_in_text(path):
+    """
+    Concatenates the files of a directory into a single text.
+    :param path: Directory path.
+    :return: Concatenated text.
+    """
+    files = []
+    for f in os.listdir(path):
+        full_path = os.path.join(path, f)
+        if os.path.isfile(full_path):
+            files.append(full_path)
+    
+    texts = []
+    for file in files:
+        with open(file, 'r') as f:
+            file_content = f.read()
+            texts.append(file_content)
+            
+    return ' '.join(texts)
 
 
 

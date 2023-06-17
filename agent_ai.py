@@ -173,39 +173,19 @@ def send_email(chronicle, final_filename, topic, sources, output_filename):
 print("""
     Bienvenue dans le générateur de podcasts Brightness AI !
     Ce script va vous permettre de générer un podcast à partir de sources de veille.
-    Il va d'abord vous demander de saisir un sujet de veille, puis il va récupérer les sources de veille sur Feedly,
-    les parsant, les résument et les envoyant par mail sous la forme d'une chronique.
+    Il va d'abord vous demander de choisir les articles à résumer, puis
+    les parser, les résumer et les envoyer par mail sous la forme d'une chronique.
 """)
+
+topic = "Intelligence Artificielle"
+feed = "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYyLCJlZGl0aW9uIjoibGFzdCJ9.IswPZy0ZFMgrJRIMX21OU_UDnWU7NF-FOf3DCT_8sVQ"
+n_links = 15
 
 
 #if st.button('Soumettre'):
 try:
-    ##########################################################################################################################################################################
-    # demander à l'utilisateur s'il veut donner un feed ou choisir un sujet
-    topic = input('Pour commencer, veuillez saisir un sujet de veille : ')
-        
-    ##########################################################################################################################################################################
-    # si l'utilisateur choisis un sujet, on récupère les feeds associés
-    feeds = get_feedly_feeds(topic)
-      
-    ##########################################################################################################################################################################
-    # formattage et affichage des urls
-    formatted_list = [' / '.join(item) for item in feeds]
-    formatted_string = '\n\n'.join(formatted_list)
-    print("\n\n Sources & URLs :\n")
-    print(formatted_string)
-    print("\n\n")
-    
-    ##########################################################################################################################################################################
-    # confirmation
-    confirmation = input("Voulez-vous continuer avec ces sources ? (y/n) ")
-    if confirmation.lower() != 'y':
-        feed = input("saisir un flux RSS à traiter : ")
-        n_links = input("saisir le nombre de liens à traiter (max 5): ")
-        feeds = [["Feed", feed]]
-    else:
-        print("Le script continue avec les flux spécifiés...\n")
-
+  
+    feeds = [["Feed", feed]]
     
     ##########################################################################################################################################################################
     # on parse les feeds
