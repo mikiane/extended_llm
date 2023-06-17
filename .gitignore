@@ -6,4 +6,3 @@ datas/**/
 .DS_Store
 img/*
 models/
-_test*
