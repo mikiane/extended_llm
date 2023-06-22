@@ -141,7 +141,7 @@ def convert_and_merge(text, voice_id, final_filename):
 
 
 
-def mailfile(title, audio, image, destinataires, text):
+def mailfile(title, audio, destinataires, text):
     """
     Fonction pour envoyer un e-mail avec une pièce jointe via SendGrid.
     
@@ -182,23 +182,23 @@ def mailfile(title, audio, image, destinataires, text):
     message.add_attachment(attachedFile_audio)
 
     # Lecture du fichier image à joindre
-    with open(image, 'rb') as f:
-        data_image = f.read()
+    #with open(image, 'rb') as f:
+    #    data_image = f.read()
 
     # Encodage du fichier image en base64
-    encoded_image = base64.b64encode(data_image).decode()
+    #encoded_image = base64.b64encode(data_image).decode()
     
     # Détermination du type MIME du fichier image
-    mime_type_image = mimetypes.guess_type(image)[0]
+    #mime_type_image = mimetypes.guess_type(image)[0]
     
     # Création de l'objet Attachment pour l'image
-    attachedFile_image = Attachment(
-        FileContent(encoded_image),
-        FileName(image),
-        FileType(mime_type_image),
-        Disposition('attachment')
-    )
-    message.add_attachment(attachedFile_image)
+    #attachedFile_image = Attachment(
+    ##    FileContent(encoded_image),
+    #    FileName(image),
+    #    FileType(mime_type_image),
+    #    Disposition('attachment')
+    #)
+    #message.add_attachment(attachedFile_image)
 
     # Tentative d'envoi de l'e-mail via SendGrid
     try:
@@ -271,13 +271,15 @@ def execute(prompt, site, input_data, model="gpt-4"):
         except (requests.RequestException, ValueError):
             print(f"Failed to get content from {site}.")
 
-
+    prompt, context, input_data = truncate_strings(prompt, context, input_data, 6000)
+    
     if model == "gpt-4":
         # Limitation des erreurs de longueur
         prompt, context, input_data = truncate_strings(prompt, context, input_data, 12000)
-    else:
+        
+    if model == "gpt-3.5-turbo-16k":
         # Limitation des erreurs de longueur
-        prompt, context, input_data = truncate_strings(prompt, context, input_data, 6000)
+        prompt, context, input_data = truncate_strings(prompt, context, input_data, 24000)
     
     print("TRAITEMENT DU PROMPT : \n")
     print("prompt : ", prompt, "\n")
