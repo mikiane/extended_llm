@@ -59,4 +59,4 @@ def write_content_to_file(url, filename, max_depth):
                     print(f"Failed to process {current_url}: {e}")
 
 # Usage
-write_content_to_file('https://www.gouvernement.fr/france-2030', 'f2030.txt', 3)
+write_content_to_file('https://mikiane.com', 'mikiane.txt', 2)
