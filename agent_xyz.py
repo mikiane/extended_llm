@@ -176,14 +176,14 @@ def generate_illustration(text, id_podcast):
 
 ##########################################################################################################################################################################
 # Function that send an email with the chronicle and the illustration
-def send_email(chronicle, final_filename, topic, sources):
+def send_email(chronicle, final_filename, topic, sources, email):
     # Votre code pour envoyer le courriel ici
     today = date.today()
     formatted_date = today.strftime('%d/%m/%Y')
     titre =  str(formatted_date) + f' Revue de presse {topic}'
     text = chronicle + "\n\n" + "Aller plus loin :" + "\n\n" + sources
     audio = final_filename
-    destinataires = ["michel@brightness.fr","mlevypro@gmail.com"]
+    destinataires = ["contact@mikiane.com",str(email)]
     #image = output_filename
 
     print("envoi de l'email")
@@ -203,9 +203,9 @@ print("""
 topic = "Intelligence Artificielle"
 feed = "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYyLCJlZGl0aW9uIjoibGFzdCJ9.IswPZy0ZFMgrJRIMX21OU_UDnWU7NF-FOf3DCT_8sVQ"
 n_links = 3
+email = "michel@brightness.fr"
 
 
-"""
 # Créez un parser pour les arguments
 parser = argparse.ArgumentParser(description='Script utilisant topic, feed, et n_links comme arguments.')
 
@@ -213,20 +213,23 @@ parser = argparse.ArgumentParser(description='Script utilisant topic, feed, et n
 parser.add_argument('--topic', type=str, required=True, help='Sujet à traiter.')
 parser.add_argument('--feed', type=str, required=True, help='Lien vers le flux de données.')
 parser.add_argument('--n_links', type=int, required=True, help='Nombre de liens à traiter.')
+parser.add_argument('--email', type=str, required=True, help='Adresse email du destinataire.')
+
 
 # Parsez les arguments
 args = parser.parse_args()
 
-if args.topic and args.feed and args.n_links:
+if args.topic and args.feed and args.n_links and args.email:
     topic = args.topic
     feed = args.feed
     n_links = args.n_links
-    print(f"Topic: {args.topic}, Feed: {args.feed}, Number of links: {args.n_links}")
+    email = args.email
+    print(f"Topic: {args.topic}, Feed: {args.feed}, Number of links: {args.n_links}, Email: {args.email}")
 else:
     print("Tous les arguments doivent être fournis. Utilisez --help pour plus d'informations.")
     exit(1)
 
-"""
+
 
 try:
   
@@ -262,7 +265,7 @@ try:
     # generate_illustration(chronicle, id_podcast)
     final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
     # output_filename = "img/" + id_podcast + ".png"
-    send_email(chronicle, final_filename, topic, sources)
+    send_email(chronicle, final_filename, topic, sources, email)
     
     print(f"Le podcast pour le sujet '{topic}' a été créé et envoyé par mail.")
 except Exception as e:
