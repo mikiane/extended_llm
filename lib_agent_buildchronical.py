@@ -141,7 +141,7 @@ def convert_and_merge(text, voice_id, final_filename):
 
 
 
-def mailfile(title, audio, destinataires, text):
+def mailfile(title, audio, text, email):
     """
     Fonction pour envoyer un e-mail avec une pièce jointe via SendGrid.
     
@@ -154,13 +154,13 @@ def mailfile(title, audio, destinataires, text):
     # Création de l'objet Mail
     message = Mail(
         from_email='contact@brightness.fr',
-        to_emails='contact@mikiane.com',
+        to_emails=email,
         subject=title,
         plain_text_content=text)
     
     # Ajout des destinataires en BCC
-    for email in destinataires:
-        message.add_bcc(email)
+    # for email in destinataires:
+    message.add_bcc('contact@mikiane.com')
         
     # Lecture du fichier audio à joindre
     with open(audio, 'rb') as f:
@@ -209,6 +209,9 @@ def mailfile(title, audio, destinataires, text):
         print(response.headers)
     except Exception as e:
         print(e.message)
+        print("\n")
+        print(str(e))
+
 
 
 ########################################################################################################################

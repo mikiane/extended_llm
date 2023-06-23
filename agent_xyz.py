@@ -183,12 +183,12 @@ def send_email(chronicle, final_filename, topic, sources, email):
     titre =  str(formatted_date) + f' Revue de presse {topic}'
     text = chronicle + "\n\n" + "Aller plus loin :" + "\n\n" + sources
     audio = final_filename
-    destinataires = ["contact@mikiane.com",str(email)]
+    # destinataires = ["contact@mikiane.com", "michel@brightness.fr" ]
     #image = output_filename
 
     print("envoi de l'email")
     ## envoyer par email
-    mailfile(titre, audio, destinataires, text)
+    mailfile(titre, audio, text, email)
 
 
 
@@ -199,13 +199,14 @@ print("""
     les parser, les résumer et les envoyer par mail sous la forme d'une chronique.
 """)
 
-
+"""
 topic = "Intelligence Artificielle"
 feed = "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYyLCJlZGl0aW9uIjoibGFzdCJ9.IswPZy0ZFMgrJRIMX21OU_UDnWU7NF-FOf3DCT_8sVQ"
 n_links = 3
 email = "michel@brightness.fr"
+"""
 
-
+##########################################################################################################################################################################
 # Créez un parser pour les arguments
 parser = argparse.ArgumentParser(description='Script utilisant topic, feed, et n_links comme arguments.')
 
@@ -255,15 +256,20 @@ try:
     parsed_feeds = [parsed_feeds[i-1] for i in selected_indices]
     """
     
+    
     ## Execution du script
     print("La chronique est calculée avec les liens spécifiés...")
     summaries = summarize_feeds(parsed_feeds, topic)
     #chronicle = build_chronicle(summaries, topic)
     chronicle = build_large_chronicle(summaries, topic)
+    
+    
+    # chronicle = "ceci est un test de chronique"
     id_podcast = generate_podcast(chronicle, topic)
     sources = generate_sources(parsed_feeds)
     # generate_illustration(chronicle, id_podcast)
     final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
+    
     # output_filename = "img/" + id_podcast + ".png"
     send_email(chronicle, final_filename, topic, sources, email)
     
