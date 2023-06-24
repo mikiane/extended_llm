@@ -42,7 +42,7 @@ model="gpt-4"
 #model = "gpt-3.5-turbo"
 
 
-load_dotenv(".env")  # Load the environment variables from the .env file.
+load_dotenv("/home/michel/extended_llm/.env")  # Load the environment variables from the .env file.
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 PODCASTS_PATH = os.environ.get("PODCASTS_PATH")
 SENDGRID_KEY = os.environ.get("SENDGRID_KEY")

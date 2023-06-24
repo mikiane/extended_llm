@@ -17,7 +17,8 @@ import argparse
 
 #import streamlit as st
 
-load_dotenv(".env") # Load the environment variables from the .env file.
+#load_dotenv(".env") # Load the environment variables from the .env file.
+load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
 DESTINATAIRES_TECH = os.environ.get("DESTINATAIRES_TECH")
 PODCASTS_PATH = os.environ.get("PODCASTS_PATH")
 n_feeds = 5 # define the number of feeds to get from Feedly
