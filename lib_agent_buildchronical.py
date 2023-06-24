@@ -117,7 +117,7 @@ def convert_and_merge(text, voice_id, final_filename):
     filenames = []
 
     # Add intro sequence to the beginning
-    combined = AudioSegment.from_mp3("sounds/intro.mp3")
+    combined = AudioSegment.from_mp3("/home/michel/extended_llm/sounds/intro.mp3")
 
     for i, chunk in enumerate(chunks):
         filename = f"{i}.mp3"
@@ -129,7 +129,7 @@ def convert_and_merge(text, voice_id, final_filename):
         combined += audio_segment
 
     # Add outro sequence to the end
-    combined += AudioSegment.from_mp3("sounds/outro.mp3")
+    combined += AudioSegment.from_mp3("/home/michel/extended_llm/sounds/outro.mp3")
 
     # Save the final concatenated audio file
     combined.export(final_filename, format='mp3')
