@@ -104,14 +104,14 @@ def build_chronicle(summaries, topic):
 
 ##########################################################################################################################################################################
 # Function that build a chronicle from a list of summaries
-def build_large_chronicle(summaries, topic):
+def build_large_chronicle(summaries, topic, name):
     # concatener les résumés 
     source = ""
     for summary in summaries:
         source += str(summary[2]) + "\n\n"
     
     # generer l'intro de la chronique    
-    prompt = f"Objectif : obtenir une chronique à diffuser (par email et en audio) signée par l’équipe de Brightness sans préciser la régularité du rendez-vous. \nRôle : Agis comme un rédacteur de chronique, journaliste spécialisé dans les sujets de {topic} qui rédige une chronique à destination du grand public en essayant de vulgariser au mieux, sans dénaturer la complexité du sujet traité.\nTache : Ecrire une chronique à partir des éléments de contexte.\nEtapes : Commencer directement par un des éléments du contexte et développer la chronique en créant des liaisons entre les différents articles traités.\nFormat : Adopter un ton dynamique, style radio. Sauter des lignes entre chaque article traité. Important : Ecrire tous les chiffres, les têtes de chapitre éventuels, les nombres, les dates en toutes lettres. Le texte ne doit pas comporter de parenthèses ni de tirets."
+    prompt = f"Objectif : obtenir une chronique dédiée à {name} prête à être diffusée (par email et en audio) signée par l’équipe de Brightness sans préciser la régularité du rendez-vous. \nRôle : Agis comme un rédacteur de chronique, journaliste spécialisé dans les sujets de {topic} qui rédige une chronique sépcifiquement écrite pour {name} en essayant de vulgariser au mieux, sans dénaturer la complexité du sujet traité.\nTache : Ecrire une chronique à partir des éléments de contexte.\nEtapes : Commencer directement par un des éléments du contexte et développer la chronique en créant des liaisons entre les différents articles traités.\nFormat : Adopter un ton dynamique, style radio. Sauter des lignes entre chaque article traité. Important : Ecrire tous les chiffres, les têtes de chapitre éventuels, les nombres, les dates en toutes lettres. Le texte ne doit pas comporter de parenthèses ni de tirets."
     site = ""
     input_data = source
     chronicle = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
@@ -216,6 +216,8 @@ parser.add_argument('--topic', type=str, required=True, help='Sujet à traiter.'
 parser.add_argument('--feed', type=str, required=True, help='Lien vers le flux de données.')
 parser.add_argument('--n_links', type=int, required=True, help='Nombre de liens à traiter.')
 parser.add_argument('--email', type=str, required=True, help='Adresse email du destinataire.')
+parser.add_argument('--name', type=str, required=True, help='Nom du destinataire.')
+
 
 
 # Parsez les arguments
@@ -226,7 +228,8 @@ if args.topic and args.feed and args.n_links and args.email:
     feed = args.feed
     n_links = args.n_links
     email = args.email
-    print(f"Topic: {args.topic}, Feed: {args.feed}, Number of links: {args.n_links}, Email: {args.email}")
+    name = args.name
+    print(f"Topic: {args.topic}, Feed: {args.feed}, Number of links: {args.n_links}, Email: {args.email}, Name: {args.name}")
 else:
     print("Tous les arguments doivent être fournis. Utilisez --help pour plus d'informations.")
     exit(1)
@@ -262,7 +265,7 @@ try:
     print("La chronique est calculée avec les liens spécifiés...")
     summaries = summarize_feeds(parsed_feeds, topic)
     #chronicle = build_chronicle(summaries, topic)
-    chronicle = build_large_chronicle(summaries, topic)
+    chronicle = build_large_chronicle(summaries, topic, name)
     
     
     # chronicle = "ceci est un test de chronique"
