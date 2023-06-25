@@ -265,7 +265,7 @@ try:
     print("La chronique est calculée avec les liens spécifiés...")
     summaries = summarize_feeds(parsed_feeds, topic)
     #chronicle = build_chronicle(summaries, topic)
-    chronicle = build_large_chronicle(summaries, topic, name)
+    chronicle = replace_numbers_with_text(build_large_chronicle(summaries, topic, name))
     
     
     # chronicle = "ceci est un test de chronique"

@@ -36,16 +36,43 @@ from moviepy.editor import *
 import requests
 import json
 from PIL import Image, ImageDraw, ImageFont
+from num2words import num2words
+import re
 
 
 model="gpt-4"
 #model = "gpt-3.5-turbo"
 
-
 load_dotenv("/home/michel/extended_llm/.env")  # Load the environment variables from the .env file.
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 PODCASTS_PATH = os.environ.get("PODCASTS_PATH")
 SENDGRID_KEY = os.environ.get("SENDGRID_KEY")
+
+
+
+def replace_numbers_with_text(input_string):
+    
+    # Remplacer les pourcentages
+    percentages = re.findall(r'\d+%', input_string)
+    for percentage in percentages:
+        number = percentage[:-1]
+        number_in_words = num2words(number, lang='fr')
+        input_string = input_string.replace(percentage, f"{number_in_words} pour cent")
+    
+    # Remplacer les nombres
+    numbers = re.findall(r'\b\d+\b', input_string)
+    for number in numbers:
+        number_in_words = num2words(number, lang='fr')
+        input_string = input_string.replace(number, number_in_words)
+    
+    return input_string
+
+# Exemple d'utilisation
+input_string = "J'ai obtenu 90% à l'examen et mon ami a obtenu 100%. J'ai eu 95 points."
+output_string = replace_numbers_with_text(input_string)
+print(output_string)
+
+
 
 def split_text(text, limit=1000):
     """
