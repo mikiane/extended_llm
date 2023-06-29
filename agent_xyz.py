@@ -109,13 +109,27 @@ def build_large_chronicle(summaries, topic, name):
     source = ""
     for summary in summaries:
         source += str(summary[2]) + "\n\n"
-    
-    # generer l'intro de la chronique    
-    prompt = f"Objectif : Ecrire une chronique personnalisée pour {name} prête à être diffusée (par email et en audio). La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un rédacteur de chronique, journaliste spécialisé dans les sujets de {topic}. Le journaliste rédige une chronique personnalisée pour {name}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une chronique à partir des éléments de contexte.\nEtapes : Commencer directement par un des éléments du contexte et développer la chronique en créant des liaisons entre les différents articles traités.\nFormat : Adopter un ton dynamique, style radio. Sauter des lignes entre chaque article traité. Important : Ecrire tous les chiffres, les têtes de chapitre éventuels, les nombres, les dates en toutes lettres. Le texte ne doit pas comporter de parenthèses ni de tirets."
+          
+    ### INTRO
+    """Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio.”
+    """
+    prompt = f"Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio."
     site = ""
     input_data = source
-    chronicle = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
-         
+    intro = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
+    
+    ### ARTICLES
+    articles = source
+    
+    ### CONCLUSION
+    """Objectif : Conclure une chronique radio personnalisée pour {name}. La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : Adopter un ton dynamique, court et style radio.”
+    """    
+    prompt = f"Objectif : Conclure une chronique radio personnalisée pour {name}. La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : Adopter un ton dynamique, court et style radio."
+    site = ""
+    input_data = ""
+    conclu = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
+      
+    chronicle = str(intro) + "\n\n" + str(articles) + "\n\n" + str(conclu)
     return(chronicle)
 
 

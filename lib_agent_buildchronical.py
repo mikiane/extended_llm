@@ -67,10 +67,6 @@ def replace_numbers_with_text(input_string):
     
     return input_string
 
-# Exemple d'utilisation
-input_string = "J'ai obtenu 90% à l'examen et mon ami a obtenu 100%. J'ai eu 95 points."
-output_string = replace_numbers_with_text(input_string)
-print(output_string)
 
 
 
