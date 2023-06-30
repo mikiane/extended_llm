@@ -38,12 +38,16 @@ import json
 from PIL import Image, ImageDraw, ImageFont
 from num2words import num2words
 import re
+from lib__path import *
 
 
 model="gpt-4"
 #model = "gpt-3.5-turbo"
 #load_dotenv(".env")  # Load the environment variables from the .env file.
-load_dotenv("/home/michel/extended_llm/.env")  # Load the environment variables from the .env file.
+#load_dotenv("/home/michel/extended_llm/.env")  # Load the environment variables from the .env file.
+load_dotenv(DOTENVPATH)
+
+
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 PODCASTS_PATH = os.environ.get("PODCASTS_PATH")
 SENDGRID_KEY = os.environ.get("SENDGRID_KEY")
@@ -140,7 +144,7 @@ def convert_and_merge(text, voice_id, final_filename):
     filenames = []
 
     # Add intro sequence to the beginning
-    combined = AudioSegment.from_mp3("sounds/intro.mp3")
+    combined = AudioSegment.from_mp3(str(LOCALPATH) + "sounds/intro.mp3")
     #combined = AudioSegment.from_mp3("/home/michel/extended_llm/sounds/intro.mp3")
 
     for i, chunk in enumerate(chunks):
@@ -154,7 +158,7 @@ def convert_and_merge(text, voice_id, final_filename):
 
     # Add outro sequence to the end
     #combined += AudioSegment.from_mp3("/home/michel/extended_llm/sounds/outro.mp3")
-    combined += AudioSegment.from_mp3("sounds/outro.mp3")
+    combined += AudioSegment.from_mp3(str(LOCALPATH) + "sounds/outro.mp3")
 
     # Save the final concatenated audio file
     combined.export(final_filename, format='mp3')

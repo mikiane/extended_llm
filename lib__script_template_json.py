@@ -30,7 +30,6 @@
 * `execute_json(input_json_file, output_json_file)`: This function reads tasks from an input JSON file, executes each task using the `exec_task()` function, and writes the results back to an output JSON file.
 """
 
-
 import json
 import lib__embedded_context
 from dotenv import load_dotenv
@@ -44,6 +43,7 @@ from dotenv import load_dotenv
 from queue import Queue
 import json
 from datetime import *
+from lib__path import *
 
 
 
@@ -162,8 +162,9 @@ def text_to_json(text, json_file):
 
 def request_llm(prompt, context, input_data, model="gpt-4"):
     #load_dotenv(".env") # Load the environment variables from the .env file.
-    load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
-
+    #load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+    load_dotenv(DOTENVPATH)
+    
     attempts = 0
     execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -243,7 +244,9 @@ def execute_tasks(tasks, model):
             prompt, context, input_data = truncate_strings(prompt, context, input_data, 4500)
 
         # prepare input data
-        load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+        load_dotenv(DOTENVPATH)
+
+        #load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
         #load_dotenv(".env") # Load the environment variables from the .env file.
         execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
         system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
@@ -289,7 +292,9 @@ def execute_tasks(tasks, model):
     
 def request_llm_stream(prompt, context, input_data, model) :
     #load_dotenv(".env") # Load the environment variables from the .env file.
-    load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+    #load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+    load_dotenv(DOTENVPATH)
+
     execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
     system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
 

@@ -14,11 +14,14 @@ import ast
 from datetime import *
 import random
 import argparse
+from lib__path import *
 
 #import streamlit as st
 
 #load_dotenv(".env") # Load the environment variables from the .env file.
-load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+#load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+
+load_dotenv(DOTENVPATH)
 DESTINATAIRES_TECH = os.environ.get("DESTINATAIRES_TECH")
 PODCASTS_PATH = os.environ.get("PODCASTS_PATH")
 n_feeds = 5 # define the number of feeds to get from Feedly
@@ -119,7 +122,7 @@ def build_large_chronicle(summaries, topic, name):
     ### INTRO
     """Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio.”
     """
-    prompt = f"Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour une personne nommée : {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecris une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio."
+    prompt = f"Objectif : Ecrire l’introduction d’une chronique personnalisée pour {name} en agissant comme un journaliste spécialisé dans les sujets de {topic}. Vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecris une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio. Fais en une chronique dédiée à {name}"
     site = ""
     input_data = titres
     intro = execute(prompt, site, input_data, "gpt-4")
@@ -226,11 +229,12 @@ print("""
     les parser, les résumer et les envoyer par mail sous la forme d'une chronique.
 """)
 
-"""
+
 topic = "Intelligence Artificielle"
 feed = "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYyLCJlZGl0aW9uIjoibGFzdCJ9.IswPZy0ZFMgrJRIMX21OU_UDnWU7NF-FOf3DCT_8sVQ"
 n_links = 3
 email = "michel@brightness.fr"
+name = "Michel"
 """
 
 ##########################################################################################################################################################################
@@ -260,7 +264,7 @@ else:
     print("Tous les arguments doivent être fournis. Utilisez --help pour plus d'informations.")
     exit(1)
 
-
+"""
 
 try:
   

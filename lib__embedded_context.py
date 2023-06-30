@@ -39,6 +39,7 @@ import requests
 from bs4 import BeautifulSoup
 from markdownify import markdownify as md
 from urllib.parse import urlparse, urljoin
+from lib__path import *
 
 """
 #############################################################################################################
@@ -355,7 +356,9 @@ def create_embeddings(path, filename):
     :param path: The directory path where the input and output CSV files are located.
     :param filename: The name of the input CSV file from which to read the text data.
     """
-    load_dotenv(".env") # Load the environment variables from the .env file.
+    
+    load_dotenv(DOTENVPATH)
+    # load_dotenv(".env") # Load the environment variables from the .env file.
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
        

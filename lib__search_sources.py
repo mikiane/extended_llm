@@ -10,9 +10,12 @@
 import requests
 from dotenv import load_dotenv
 import os
+from lib__path import *
 
 #Récupération des sites de veille via Feedly
-load_dotenv(".env") # Load the environment variables from the .env file.
+load_dotenv(DOTENVPATH)
+
+#load_dotenv(".env") # Load the environment variables from the .env file.
 FEEDLY_API_TOKEN = os.environ.get("FEEDLY_API_TOKEN")
 api_token = FEEDLY_API_TOKEN
 
