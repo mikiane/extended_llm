@@ -166,8 +166,8 @@ def generate_podcast(text, topic):
     ############################################
 
     # creation de l'audio
-    #voice_id = "DnF3PZl1PUQOKY4LvcUl" # MLP
-    voice_id = "TxGEqnHWrfWFTfGW9XjX"  # Josh
+    voice_id = "DnF3PZl1PUQOKY4LvcUl" # MLP
+    #voice_id = "TxGEqnHWrfWFTfGW9XjX"  # Josh
     final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
 
     # gestion des intonations.
