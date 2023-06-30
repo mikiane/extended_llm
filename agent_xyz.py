@@ -108,8 +108,10 @@ def build_chronicle(summaries, topic):
 def build_large_chronicle(summaries, topic, name):
     # concatener les résumés 
     source = ""
+    titres = ""
     for summary in summaries:
         source += str(summary[2]) + "\n\n"
+        titres += str(summary[0]) + "\n\n"
         
         
     print(str(datetime.now()) +  " : SOURCES AVANT LA CREATION DES INTROS / CONCLUSIONS : \n\n " + source + "\n\n\n")
@@ -117,10 +119,10 @@ def build_large_chronicle(summaries, topic, name):
     ### INTRO
     """Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio.”
     """
-    prompt = f"Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio."
+    prompt = f"Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour une personne nommée : {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecris une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio."
     site = ""
-    input_data = source
-    intro = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
+    input_data = titres
+    intro = execute(prompt, site, input_data, "gpt-4")
     
     
     print(str(datetime.now()) +  " : INTRO : \n\n " + intro + "\n\n\n")
@@ -135,7 +137,7 @@ def build_large_chronicle(summaries, topic, name):
     prompt = f"Objectif : Conclure une chronique radio personnalisée pour {name}. La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : Adopter un ton dynamique, court et style radio."
     site = ""
     input_data = ""
-    conclu = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
+    conclu = execute(prompt, site, input_data, "gpt-4")
     
     print(str(datetime.now()) +  " : CONCLU : \n\n " + conclu + "\n\n\n")
       
