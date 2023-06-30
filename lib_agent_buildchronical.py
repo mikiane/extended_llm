@@ -42,7 +42,7 @@ import re
 
 model="gpt-4"
 #model = "gpt-3.5-turbo"
-
+#load_dotenv(".env")  # Load the environment variables from the .env file.
 load_dotenv("/home/michel/extended_llm/.env")  # Load the environment variables from the .env file.
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 PODCASTS_PATH = os.environ.get("PODCASTS_PATH")
@@ -140,7 +140,8 @@ def convert_and_merge(text, voice_id, final_filename):
     filenames = []
 
     # Add intro sequence to the beginning
-    combined = AudioSegment.from_mp3("/home/michel/extended_llm/sounds/intro.mp3")
+    combined = AudioSegment.from_mp3("sounds/intro.mp3")
+    #combined = AudioSegment.from_mp3("/home/michel/extended_llm/sounds/intro.mp3")
 
     for i, chunk in enumerate(chunks):
         filename = f"{i}.mp3"
@@ -152,7 +153,8 @@ def convert_and_merge(text, voice_id, final_filename):
         combined += audio_segment
 
     # Add outro sequence to the end
-    combined += AudioSegment.from_mp3("/home/michel/extended_llm/sounds/outro.mp3")
+    #combined += AudioSegment.from_mp3("/home/michel/extended_llm/sounds/outro.mp3")
+    combined += AudioSegment.from_mp3("sounds/outro.mp3")
 
     # Save the final concatenated audio file
     combined.export(final_filename, format='mp3')
@@ -306,12 +308,7 @@ def execute(prompt, site, input_data, model="gpt-4"):
     if model == "gpt-3.5-turbo-16k":
         # Limitation des erreurs de longueur
         prompt, context, input_data = truncate_strings(prompt, context, input_data, 24000)
-    
-    print("TRAITEMENT DU PROMPT : \n")
-    print("prompt : ", prompt, "\n")
-    print("context : ", context, "\n")
-    print("input_data : ", input_data, "\n")
-    print("model : ", model, "\n")
+
         
     # Appel au LLM
     res = request_llm(prompt, context, input_data, model)

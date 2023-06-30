@@ -43,6 +43,7 @@ from urllib.parse import unquote
 from dotenv import load_dotenv
 from queue import Queue
 import json
+from datetime import *
 
 
 
@@ -160,10 +161,11 @@ def text_to_json(text, json_file):
 
 
 def request_llm(prompt, context, input_data, model="gpt-4"):
-    load_dotenv(".env") # Load the environment variables from the .env file.
+    #load_dotenv(".env") # Load the environment variables from the .env file.
+    load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+
     attempts = 0
     execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
-    print("EXECUTION DU PROMPT : " + execprompt)
     api_key = os.environ.get("OPENAI_API_KEY")
     system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
 
@@ -183,9 +185,11 @@ def request_llm(prompt, context, input_data, model="gpt-4"):
                     {'role': 'system', 'content': system}
                 ]
             }
+            print(str(datetime.now()) + " : " + "Appel au LLM: " + str(model) + "\n\n")
             response = requests.post(url, headers=headers, json=data)
             json_data = response.json()
             message = json_data['choices'][0]['message']['content']
+            print(str(datetime.now()) + " : " + "Réponse : " + str(message) + "\n\n")
             return message.strip()
         
         except Exception as e:
@@ -239,7 +243,8 @@ def execute_tasks(tasks, model):
             prompt, context, input_data = truncate_strings(prompt, context, input_data, 4500)
 
         # prepare input data
-        load_dotenv(".env") # Load the environment variables from the .env file.
+        load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
+        #load_dotenv(".env") # Load the environment variables from the .env file.
         execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
         system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
         attempts = 0
@@ -283,7 +288,8 @@ def execute_tasks(tasks, model):
     
     
 def request_llm_stream(prompt, context, input_data, model) :
-    load_dotenv(".env") # Load the environment variables from the .env file.
+    #load_dotenv(".env") # Load the environment variables from the .env file.
+    load_dotenv("/home/michel/extended_llm/.env") # Load the environment variables from the .env file.
     execprompt = "Context : " + context + "\n" + input_data + "\n" + "Query : " + prompt
     system = "Je suis un assistant parlant parfaitement le français et l'anglais capable de corriger, rédiger, paraphraser, traduire, résumer, développer des textes."
 

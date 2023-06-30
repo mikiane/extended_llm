@@ -11,7 +11,7 @@ from lib_agent_buildchronical import *
 import lib__search_sources
 import sys
 import ast
-from datetime import date
+from datetime import *
 import random
 import argparse
 
@@ -72,13 +72,14 @@ def summarize_feeds(rss_urls, topic):
     ## generer les résumés
     summaries = []
     for site_name, url, link_title in rss_urls:
-        prompt = f"Rédige un résumé vulgarisé de cet article en respectant la complexité du sujet. Agis comme un journaliste spécialisé dans les sujets de {topic} qui essaye de vulgariser au mieux, sans dénaturer la complexité du sujet traité. \n\nFormat : Adopte un ton dynamique, style radio. Ecrire tous les chiffres, les têtes de chapitre éventuels, les nombres, les dates en toutes lettres. Le texte ne doit pas comporter de parenthèses ni de tirets."
+        print(str(datetime.now()) +  " : Summarization de " + link_title + " : " + url)
+        prompt = f"Rédige un résumé de cet article en respectant la complexité du sujet. Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : ne précise jamais qu'il s'agit d'un résumé. Ecrire tous les chiffres, les nombres, les dates en toutes lettres. Le texte ne doit pas comporter de parenthèses ni de tirets. Ne démarre pas le résumé par 'Bonjour' ou une formule de politesse. Entre directement dans le vif du sujet."
         site = url
         input_data = ""
         summary = execute(prompt, site, input_data, "gpt-4")
         prompt = "Rédige un titre pour cet article. Format : Adopter un ton dynamique, style radio. Ecrire tous les chiffres, les nombres, les dates en toutes lettres. Le texte ne doit pas comporter de parenthèses ni de tirets."
         titre = execute(prompt, "", summary, "gpt-4")
-        print("\n\n\n\n" + "" + titre + "" + "\n\n" + summary)
+        print( str(datetime.now()) +  " : RESUMÉ DE L'ARTICLE : \n\n\n\n" + "" + titre + "" + "\n\n" + summary)
         
         if summary is not None:  # only add the line if the result is not None
             summaries.append([link_title, url, "\n\n\n\n" + "" + titre + "" + "\n\n" + summary])  # replace site_name with link_title
@@ -109,6 +110,9 @@ def build_large_chronicle(summaries, topic, name):
     source = ""
     for summary in summaries:
         source += str(summary[2]) + "\n\n"
+        
+        
+    print(str(datetime.now()) +  " : SOURCES AVANT LA CREATION DES INTROS / CONCLUSIONS : \n\n " + source + "\n\n\n")
           
     ### INTRO
     """Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio.”
@@ -117,6 +121,10 @@ def build_large_chronicle(summaries, topic, name):
     site = ""
     input_data = source
     intro = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
+    
+    
+    print(str(datetime.now()) +  " : INTRO : \n\n " + intro + "\n\n\n")
+
     
     ### ARTICLES
     articles = source
@@ -128,6 +136,8 @@ def build_large_chronicle(summaries, topic, name):
     site = ""
     input_data = ""
     conclu = execute(prompt, site, input_data, "gpt-3.5-turbo-16k")
+    
+    print(str(datetime.now()) +  " : CONCLU : \n\n " + conclu + "\n\n\n")
       
     chronicle = str(intro) + "\n\n" + str(articles) + "\n\n" + str(conclu)
     return(chronicle)
@@ -276,18 +286,26 @@ try:
     
     
     ## Execution du script
-    print("La chronique est calculée avec les liens spécifiés...")
+    print(str(datetime.now()) +  " : Summarization des articles...\n")
     summaries = summarize_feeds(parsed_feeds, topic)
     #chronicle = build_chronicle(summaries, topic)
+    
+    print(str(datetime.now()) +  " : Construction de la chronique...\n")
     chronicle = replace_numbers_with_text(build_large_chronicle(summaries, topic, name))
     
     
     # chronicle = "ceci est un test de chronique"
+    
+    print(str(datetime.now()) +  " : Génération du podcast...\n")
     id_podcast = generate_podcast(chronicle, topic)
+    
+    print(str(datetime.now()) +  " : Génération des sources...\n")
     sources = generate_sources(parsed_feeds)
     # generate_illustration(chronicle, id_podcast)
     final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
     
+    print(str(datetime.now()) +  " : Envoi de l'email...\n")
+
     # output_filename = "img/" + id_podcast + ".png"
     send_email(chronicle, final_filename, topic, sources, email)
     
