@@ -235,7 +235,7 @@ feed = "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYy
 n_links = 3
 email = "michel@brightness.fr"
 name = "Michel"
-"""
+
 
 ##########################################################################################################################################################################
 # Créez un parser pour les arguments
@@ -264,7 +264,7 @@ else:
     print("Tous les arguments doivent être fournis. Utilisez --help pour plus d'informations.")
     exit(1)
 
-"""
+##########################################################################################################################################################################
 
 try:
   

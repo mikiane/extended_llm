@@ -4,11 +4,8 @@
 0 5 * * * /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Nouvelles internationales du jour" --feed "https://rss.app/feeds/tKbfUEXWugQvT0Lk.xml" --n_links 8 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 
 # Lundi
-# 0 3 * * 1 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "ChatGPT et Generative AI" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYyLCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.ez4uhJdh1rmr052Q0u54c06nf9aexC7YZOg0JDuFQso" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 0 3 * * 1 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "ChatGPT et Generative AI" --feed "https://rss.app/feeds/ts7TBAc6R3BNeWTU.xml" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
-# 0 1 * * 1 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Formation et e-learning" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyODcwLCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.P2fqAO3Ea5VYsua4SC3ZvGyTvpslBPT_8ST1SLF2lYM" --n_links 4 --email "nawal@brightness.fr" --name "Naouelle" >> /home/michel/extended_llm/agent_xyz.log 
 0 1 * * 1 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Formation et e-learning" --feed "https://rss.app/feeds/thincHVB6ivNVkfe.xml" --n_links 4 --email "nawal@brightness.fr" --name "Naouelle" >> /home/michel/extended_llm/agent_xyz.log 
-
 0 15 * * 1 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Metaverse" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyODY1LCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.ixRdUmkPlswwemIPE51On22blEOtLlthHjK8qABhhwU" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 
 
@@ -18,7 +15,6 @@
 0 15 * * 2 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "HealthTech" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyODYzLCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.OYiocp0zJV666R_yHCOwrBmLYvzuVpqqGzCuTeLKxZU" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 
 # Mercredi
-
 0 3 * * 3 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Crypto et token economie" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyODU5LCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.4sXZF_wNZXx2bofLcblYcTb2UQ6k8LTxGxmXB19cdtw" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 0 1 * * 3 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Leadership et management" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyODY4LCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9._UPQaCTBMSvcY-YT1qhB-0Eg2h2HyzgMWCBV_pFfzD8" --n_links 4 --email "nawal@brightness.fr" --name "Naouelle" >> /home/michel/extended_llm/agent_xyz.log 
 0 15 * * 3 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Digital Twins" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyODYxLCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.i-rpO8kE40tF-jETZa0gis5hIYWgnq3eZ7gBfCy5KcM" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
@@ -38,6 +34,7 @@
 
 
 # Samedi
+0 1 * * 6 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Trending topics sur Tik Tok" --feed "https://rss.app/feeds/t9bBEesh4EaqZh90.xml" --n_links 10 --email "michel@brightness.fr" --name "Cyrille" >> /home/michel/extended_llm/agent_xyz.log 
 0 3 * * 6 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Intelligence Artificielle" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYxLCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.9Jha1LyxzzlEzA4xRtJqp1MD323gQZXvENePFMq8ptY" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 0 15 * * 6 /usr/local/bin/python3.10 /home/michel/extended_llm/agent_xyz.py --topic "Machine Learning" --feed "https://flint.media/bots/feeds/eyJhbGciOiJIUzI1NiJ9.eyJib3RfaWQiOjEyNzYzLCJlZGl0aW9uIjoibWF0Y2hfc2FtcGxlcyJ9.VKrt88Fr4v0-NsDiAN50M9cfbSy4E2RgO0OvK9KMDXA" --n_links 4 --email "michel@brightness.fr" --name "Michel" >> /home/michel/extended_llm/agent_xyz.log 
 
