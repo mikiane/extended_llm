@@ -220,7 +220,18 @@ def send_email(chronicle, final_filename, topic, sources, email):
     ## envoyer par email
     mailfile(titre, audio, text, email)
 
-
+##########################################################################################################################################################################
+# Function that send an email with the chronicle without audio
+def send_email_nofile(chronicle, topic, sources, email):
+    # Votre code pour envoyer le courriel ici
+    today = date.today()
+    formatted_date = today.strftime('%d/%m/%Y')
+    titre =  str(formatted_date) + f' Revue de presse {topic}'
+    text = chronicle + "\n\n" + "Aller plus loin :" + "\n\n" + sources
+   
+    print("envoi de l'email")
+    ## envoyer par email
+    mail_nofile(titre, text, email)
 
 print("""
     Bienvenue dans le générateur de podcasts Brightness AI !
@@ -247,13 +258,16 @@ parser.add_argument('--feed', type=str, required=True, help='Lien vers le flux d
 parser.add_argument('--n_links', type=int, required=True, help='Nombre de liens à traiter.')
 parser.add_argument('--email', type=str, required=True, help='Adresse email du destinataire.')
 parser.add_argument('--name', type=str, required=True, help='Nom du destinataire.')
+parser.add_argument('--podcast', type=str, required=False, help='no : if you dont want to generate a podcast')
 
-
+genpodcast = True
 
 # Parsez les arguments
 args = parser.parse_args()
-
-if args.topic and args.feed and args.n_links and args.email:
+if args.podcast and args.podcast == "no":
+    genpodcast = False
+    
+if args.topic and args.feed and args.n_links and args.email and args.name:
     topic = args.topic
     feed = args.feed
     n_links = args.n_links
@@ -299,23 +313,22 @@ try:
     print(str(datetime.now()) +  " : Construction de la chronique...\n")
     chronicle = replace_numbers_with_text(build_large_chronicle(summaries, topic, name))
     
-    
-    # chronicle = "ceci est un test de chronique"
-    
-    print(str(datetime.now()) +  " : Génération du podcast...\n")
-    id_podcast = generate_podcast(chronicle, topic)
-    
     print(str(datetime.now()) +  " : Génération des sources...\n")
     sources = generate_sources(parsed_feeds)
-    # generate_illustration(chronicle, id_podcast)
-    final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
-    
-    print(str(datetime.now()) +  " : Envoi de l'email...\n")
+        
+    if genpodcast:
+        print(str(datetime.now()) +  " : Génération du podcast...\n")
+        id_podcast = generate_podcast(chronicle, topic)
+        final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
 
-    # output_filename = "img/" + id_podcast + ".png"
-    send_email(chronicle, final_filename, topic, sources, email)
-    
-    print(f"Le podcast pour le sujet '{topic}' a été créé et envoyé par mail.")
+        print(str(datetime.now()) +  " : Envoi de l'email...\n")
+        # output_filename = "img/" + id_podcast + ".png"
+        send_email(chronicle, final_filename, topic, sources, email)
+        print(f"Le podcast pour le sujet '{topic}' a été créé et envoyé par mail.")
+        
+    else:     
+        send_email_nofile(chronicle, topic, sources, email)
+        
 except Exception as e:
     print("Une erreur s'est produite: ", e)
 

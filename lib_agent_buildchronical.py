@@ -243,6 +243,34 @@ def mailfile(title, audio, text, email):
 
 
 
+def mail_nofile(title, text, email):
+    """
+    Fonction pour envoyer un e-mail sans pièce jointe via SendGrid.
+    """
+    # Création de l'objet Mail
+    message = Mail(
+        from_email='contact@brightness.fr',
+        to_emails=email,
+        subject=title,
+        plain_text_content=text)
+    
+    # Ajout des destinataires en BCC
+    # for email in destinataires:
+    message.add_bcc('contact@mikiane.com')
+        
+    # Tentative d'envoi de l'e-mail via SendGrid
+    try:
+        sg = SendGridAPIClient(SENDGRID_KEY)
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
+        print("\n")
+        print(str(e))
+
+
 ########################################################################################################################
 ## Function that return the first feed from an RSS feed
 import feedparser
