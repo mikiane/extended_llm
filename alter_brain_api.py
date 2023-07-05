@@ -43,7 +43,7 @@ base_folder = "datas/"
 
 # Initialize Flask application
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+#CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # Limit the size of uploaded files to 100 MB
 
