@@ -5,10 +5,10 @@ import pdfplumber
 import os
 import io
 
-URL = "https://www.nouvelle-aquitaine.fr/"
-DEPTH = 2
-OUTPUTFILE = "datas/nvellea.txt"
-DOMAIN = 'www.nouvelle-aquitaine.fr'  # Specify the domain
+URL = "https://arbevel.com/fr/"
+DEPTH = 4
+OUTPUTFILE = "../datas/arbevel.txt"
+DOMAIN = 'arbevel.com'  # Specify the domain
 
 def get_text_from_page(url):
     response = requests.get(url)

@@ -331,12 +331,11 @@ try:
         
 except Exception as e:
     print("Une erreur s'est produite: ", e)
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
