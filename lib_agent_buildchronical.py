@@ -467,7 +467,7 @@ def create_image_with_text(text, input_file, output_file):
 ########################################################################################################################
 ### Function that uses GPT 3.5 to convert a text into an HTML page
 def convert_into_html(text, model="gpt-3.5-turbo-16k"):
-    prompt = "Formater ce texte en HTML sans les balises doc type, head et body mais en ajoutant des titres et en les formatant : \n\n"
+    prompt = "Formater ce texte en HTML sans modifier le contenu et sans utiliser les balises doc type, head et body mais en ajoutant des titres et en les formatant : \n\n"
     return request_llm(prompt, text, "", model)
 
 ########################################################################################################################
