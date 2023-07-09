@@ -264,7 +264,7 @@ parser.add_argument('--name', type=str, required=True, help='Nom du destinataire
 parser.add_argument('--podcast', type=str, required=False, help='no : if you dont want to generate a podcast')
 parser.add_argument('--html', type=str, required=False, help='yes : if you  want to generate an HTML email')
 
-
+htmlformat = False
 genpodcast = True
 
 # Parsez les arguments
