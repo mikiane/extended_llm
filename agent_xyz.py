@@ -122,7 +122,7 @@ def build_large_chronicle(summaries, topic, name):
     ### INTRO
     """Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio.”
     """
-    prompt = f"Objectif : Ecrire l’introduction d’une chronique personnalisée pour {name} en agissant comme un journaliste spécialisé dans les sujets de {topic}. Vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecris une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio. Fais en une chronique dédiée à {name}"
+    prompt = f"Objectif : Ecrire l'introduction synthétique d’une chronique personnalisée pour {name} en agissant comme un journaliste spécialisé dans les sujets de {topic}. \nTache : Ecrire tous les titres des articles contenus dans le contexte en sautant une ligne pour chaque titre.\nFormat : Adopter un ton dynamique, style radio. Fais en une introduction dédiée à {name}"
     site = ""
     input_data = titres
     intro = execute(prompt, site, input_data, "gpt-4")
@@ -148,6 +148,9 @@ def build_large_chronicle(summaries, topic, name):
     return(chronicle)
 
 
+def build_large_chronicle_html(summaries, topic, name):
+    return(convert_into_html(build_large_chronicle(summaries, topic, name), "gpt-3.5-turbo-16k"))
+
 ##########################################################################################################################################################################
 # Function that generate a prompte to build an image
 def generate_podcast(text, topic):
@@ -166,8 +169,8 @@ def generate_podcast(text, topic):
     ############################################
 
     # creation de l'audio
-    voice_id = "DnF3PZl1PUQOKY4LvcUl" # MLP
-    #voice_id = "TxGEqnHWrfWFTfGW9XjX"  # Josh
+    #voice_id = "DnF3PZl1PUQOKY4LvcUl" # MLP
+    voice_id = "TxGEqnHWrfWFTfGW9XjX"  # Josh
     final_filename = PODCASTS_PATH + "final_podcast" + id_podcast + ".mp3"
 
     # gestion des intonations.
@@ -259,6 +262,8 @@ parser.add_argument('--n_links', type=int, required=True, help='Nombre de liens 
 parser.add_argument('--email', type=str, required=True, help='Adresse email du destinataire.')
 parser.add_argument('--name', type=str, required=True, help='Nom du destinataire.')
 parser.add_argument('--podcast', type=str, required=False, help='no : if you dont want to generate a podcast')
+parser.add_argument('--html', type=str, required=False, help='yes : if you  want to generate an HTML email')
+
 
 genpodcast = True
 
@@ -266,6 +271,9 @@ genpodcast = True
 args = parser.parse_args()
 if args.podcast and args.podcast == "no":
     genpodcast = False
+    
+if args.html and args.html == "yes":
+    htmlformat = True
     
 if args.topic and args.feed and args.n_links and args.email and args.name:
     topic = args.topic
@@ -311,7 +319,10 @@ try:
     #chronicle = build_chronicle(summaries, topic)
     
     print(str(datetime.now()) +  " : Construction de la chronique...\n")
-    chronicle = replace_numbers_with_text(build_large_chronicle(summaries, topic, name))
+    if htmlformat:
+        chronicle = build_large_chronicle_html(summaries, topic, name)
+    else:
+        chronicle = replace_numbers_with_text(build_large_chronicle(summaries, topic, name))
     
     print(str(datetime.now()) +  " : Génération des sources...\n")
     sources = generate_sources(parsed_feeds)
