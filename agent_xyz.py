@@ -235,6 +235,22 @@ def send_email_nofile(chronicle, topic, sources, email):
     print("envoi de l'email")
     ## envoyer par email
     mail_nofile(titre, text, email)
+    
+    
+    
+    
+def send_email_html(chronicle, topic, sources, email):
+    # Votre code pour envoyer le courriel ici
+    today = date.today()
+    formatted_date = today.strftime('%d/%m/%Y')
+    titre =  str(formatted_date) + f' Revue de presse {topic}'
+    text = chronicle + "\n\n" + "Aller plus loin :" + "\n\n" + sources
+   
+    print("envoi de l'email")
+    ## envoyer par email
+    mail_html(titre, text, email)
+
+        
 
 print("""
     Bienvenue dans le générateur de podcasts Brightness AI !
@@ -338,7 +354,10 @@ try:
         print(f"Le podcast pour le sujet '{topic}' a été créé et envoyé par mail.")
         
     else:     
-        send_email_nofile(chronicle, topic, sources, email)
+        if htmlformat:
+            send_email_html(chronicle, topic, sources, email)
+        else:
+            send_email_nofile(chronicle, topic, sources, email)
         
 except Exception as e:
     print("Une erreur s'est produite: ", e)

@@ -271,6 +271,33 @@ def mail_nofile(title, text, email):
         print(str(e))
 
 
+def mail_html(title, text, email):
+    """
+    Fonction pour envoyer un e-mail sans pièce jointe via SendGrid.
+    """
+    # Création de l'objet Mail
+    message = Mail(
+        from_email='contact@brightness.fr',
+        to_emails=email,
+        subject=title,
+        html_content=text)
+    
+    # Ajout des destinataires en BCC
+    # for email in destinataires:
+    message.add_bcc('contact@mikiane.com')
+        
+    # Tentative d'envoi de l'e-mail via SendGrid
+    try:
+        sg = SendGridAPIClient(SENDGRID_KEY)
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
+        print("\n")
+        print(str(e))
+
 ########################################################################################################################
 ## Function that return the first feed from an RSS feed
 import feedparser
@@ -439,7 +466,7 @@ def create_image_with_text(text, input_file, output_file):
 
 ########################################################################################################################
 ### Function that uses GPT 3.5 to convert a text into an HTML page
-def convert_into_html(text, model):
+def convert_into_html(text, model="gpt-3.5-turbo-16k"):
     prompt = "Formater ce texte en HTML sans les balises doc type, head et body mais en ajoutant des titres et en les formatant : \n\n"
     return request_llm(prompt, text, "", model)
 
