@@ -149,7 +149,43 @@ def build_large_chronicle(summaries, topic, name):
 
 
 def build_large_chronicle_html(summaries, topic, name):
-    return(convert_into_html(build_large_chronicle(summaries, topic, name), "gpt-3.5-turbo-16k"))
+    # concatener les résumés 
+    source = ""
+    titres = ""
+    for summary in summaries:
+        source += str(summary[2]) + "\n\n"
+        titres += str(summary[0]) + "\n\n"
+        
+        
+    print(str(datetime.now()) +  " : SOURCES AVANT LA CREATION DES INTROS / CONCLUSIONS : \n\n " + source + "\n\n\n")
+          
+    ### INTRO
+    """Objectif : Ecrire l’introduction d’une chronique radio personnalisée pour {name}. \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. Il vulgarise sans dénaturer la complexité du sujet traité.\nTache : Ecrire une introduction en citant tous les titres des articles contenus dans le contexte.\nFormat : Adopter un ton dynamique, style radio.”
+    """
+    prompt = f"Objectif : Ecrire l'introduction synthétique d’une chronique personnalisée pour {name} en agissant comme un journaliste spécialisé dans les sujets de {topic}. \nTache : Ecrire tous les titres des articles contenus dans le contexte en sautant une ligne pour chaque titre.\nFormat : Adopter un ton dynamique, style radio. Fais en une introduction dédiée à {name}"
+    site = ""
+    input_data = titres
+    intro = convert_into_html(execute(prompt, site, input_data, "gpt-4"), "gpt-3.5-turbo-16k")
+    
+    
+    print(str(datetime.now()) +  " : INTRO : \n\n " + intro + "\n\n\n")
+
+    
+    ### ARTICLES
+    articles = convert_into_html(source, "gpt-3.5-turbo-16k")
+    
+    ### CONCLUSION
+    """Objectif : Conclure une chronique radio personnalisée pour {name}. La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : Adopter un ton dynamique, court et style radio.”
+    """    
+    prompt = f"Objectif : Conclure une chronique radio personnalisée pour {name}. La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : Adopter un ton dynamique, court et style radio."
+    site = ""
+    input_data = ""
+    conclu = convert_into_html(execute(prompt, site, input_data, "gpt-4"), "gpt-3.5-turbo-16k")
+    
+    print(str(datetime.now()) +  " : CONCLU : \n\n " + conclu + "\n\n\n")
+      
+    chronicle = str(intro) + "\n\n" + str(articles) + "\n\n" + str(conclu)
+    return(chronicle)
 
 ##########################################################################################################################################################################
 # Function that generate a prompte to build an image
