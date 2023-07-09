@@ -165,7 +165,7 @@ def build_large_chronicle_html(summaries, topic, name):
     prompt = f"Objectif : Ecrire l'introduction synthétique d’une chronique personnalisée pour {name} en agissant comme un journaliste spécialisé dans les sujets de {topic}. \nTache : Ecrire tous les titres des articles contenus dans le contexte en sautant une ligne pour chaque titre.\nFormat : Adopter un ton dynamique, style radio. Fais en une introduction dédiée à {name}"
     site = ""
     input_data = titres
-    intro = execute(prompt, site, input_data, "gpt-4"), "gpt-3.5-turbo-16k"
+    intro = execute(prompt, site, input_data, "gpt-4")
     
     
     print(str(datetime.now()) +  " : INTRO : \n\n " + intro + "\n\n\n")
@@ -180,7 +180,7 @@ def build_large_chronicle_html(summaries, topic, name):
     prompt = f"Objectif : Conclure une chronique radio personnalisée pour {name}. La chronique est signée par l’équipe de Brightness (sans préciser la régularité du rendez-vous). \nRôle : Agis comme un journaliste spécialisé dans les sujets de {topic}. \nFormat : Adopter un ton dynamique, court et style radio."
     site = ""
     input_data = ""
-    conclu = execute(prompt, site, input_data, "gpt-4"), "gpt-3.5-turbo-16k"
+    conclu = execute(prompt, site, input_data, "gpt-4")
     
     print(str(datetime.now()) +  " : CONCLU : \n\n " + conclu + "\n\n\n")
       
